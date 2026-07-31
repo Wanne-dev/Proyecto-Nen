@@ -1,0 +1,2 @@
+// Archivo: frontend/public/robots.txt
+// Propósito: Configuración de robots

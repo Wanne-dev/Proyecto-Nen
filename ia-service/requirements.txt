@@ -1,0 +1,2 @@
+// Archivo: ia-service/requirements.txt
+// Propósito: Dependencias de Python
