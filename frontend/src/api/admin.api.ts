@@ -1,2 +1,3 @@
-// Archivo: frontend/src/api/admin.api.ts
-// Prop�sito: Funciones API administrativas
+/* Cliente API — BANCA NEN (módulo admin) */
+export { adminService as adminApi } from "../services/admin";
+export * from "../services/admin";

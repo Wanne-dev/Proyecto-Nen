@@ -147,15 +147,8 @@ export default function WalletPage() {
     if (!token) return;
     try {
       const t = await getTransactions(token, 1, 50);
-      if (Array.isArray(t)) {
-        setTransactions(t);
-      } else if (t && Array.isArray(t.transactions)) {
-        setTransactions(t.transactions);
-      } else if (t && Array.isArray((t as any).data)) {
-        setTransactions((t as any).data);
-      } else {
-        setTransactions([]);
-      }
+      const raw: any[] = Array.isArray(t) ? t : Array.isArray((t as any)?.data) ? (t as any).data : [];
+      setTransactions(raw.map((tx) => ({ ...tx, amount: Number(tx.amount), fee: Number(tx.fee || 0) })) as any);
     } catch (e: any) {
       console.error("Transactions error:", e);
       setTransactions([]);
@@ -236,78 +229,10 @@ export default function WalletPage() {
 
   return (
     <ErrorBoundary>
-      <div style={{ backgroundColor: C.bg, minHeight: "100vh", color: C.t1, fontFamily: "Inter, sans-serif", display: "flex" }}>
+      <div style={{ fontFamily: "Inter, sans-serif" }}>
 
-        {/* ===== BANNER ERROR ===== */}
-        {error && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: C.red + "20", borderBottom: "1px solid " + C.red, padding: "8px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <AlertCircle size={16} color={C.red} />
-              <span style={{ fontSize: 12, color: C.red }}>{error}</span>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={loadAll} style={{ padding: "4px 12px", fontSize: 11, fontWeight: 700, backgroundColor: C.card, color: C.gold, border: "1px solid " + C.border, borderRadius: 4, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>Reintentar</button>
-              <button onClick={logout} style={{ padding: "4px 12px", fontSize: 11, fontWeight: 700, backgroundColor: C.red, color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", gap: 4 }}>
-                <LogOut size={12} /> Login
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ===== LEFT NAV ===== */}
-        <div style={{ width: 64, backgroundColor: C.bg2, borderRight: "1px solid " + C.border, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0", gap: 4 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: C.gold + "20", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <Shield size={20} color={C.gold} />
-          </div>
-          {[
-            { to: "/dashboard", Icon: LayoutDashboard },
-            { to: "/wallet", Icon: Wallet },
-            { to: "/markets", Icon: TrendingUp },
-            { to: "/settings", Icon: User },
-          ].map(({ to, Icon }) => (
-            <Link key={to} to={to} style={{ width: 40, height: 40, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: loc.pathname === to ? C.gold + "15" : "transparent", textDecoration: "none" }}>
-              <Icon size={18} color={loc.pathname === to ? C.gold : C.t3} />
-            </Link>
-          ))}
-          <div style={{ flex: 1 }} />
-          <Link to="/settings" style={{ width: 40, height: 40, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-            <Settings size={16} color={C.t3} />
-          </Link>
-        </div>
-
-        {/* ===== MAIN ===== */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
-
-          {/* ===== TOP BAR ===== */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 16px", borderBottom: "1px solid " + C.border, backgroundColor: C.bg2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontWeight: 700, fontSize: 15, color: C.gold }}>NEN</span>
-              <span style={{ fontSize: 12, color: C.t2 }}>BANK</span>
-              <span style={{ fontSize: 11, color: C.t3, margin: "0 4px" }}>|</span>
-              <div style={{ display: "flex", gap: 2 }}>
-                {[
-                  { to: "/dashboard", label: "Dashboard" },
-                  { to: "/wallet", label: "Wallet" },
-                  { to: "/markets", label: "Markets" },
-                  { to: "/settings", label: "Settings" },
-                ].map(item => (
-                  <Link key={item.to} to={item.to} style={{ fontSize: 11, color: loc.pathname === item.to ? C.gold : C.t3, textDecoration: "none", fontWeight: loc.pathname === item.to ? 700 : 400, padding: "3px 10px", borderRadius: 4, backgroundColor: loc.pathname === item.to ? C.gold + "15" : "transparent", display: "flex", alignItems: "center", gap: 5 }}>
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Bell size={15} color={C.t3} style={{ cursor: "pointer" }} />
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, backgroundColor: C.card }}>
-                <div style={{ width: 22, height: 22, borderRadius: "50%", backgroundColor: C.gold, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700 }}>
-                  {user?.firstName?.[0] || "U"}
-                </div>
-                <span style={{ fontSize: 11 }}>{user?.firstName || "User"}</span>
-              </div>
-            </div>
-          </div>
-
+        {/* Errores se muestran como toast en el layout */}
+        <div style={{ padding: 20 }}>
           {/* ===== CONTENIDO ===== */}
           <div style={{ flex: 1, padding: 20, overflowY: "auto" }}>
 

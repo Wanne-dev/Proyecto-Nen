@@ -8,7 +8,7 @@ export default function Verify() {
   const [emailVerified, setEmailVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [step, setStep] = useState<"email" | "phone" | "done">("email");
-  const { user, verifyEmailCode, verifyPhoneCode, resendVerification, isLoading, error, clearError, logout } = useAuthStore();
+  const { user, verifyEmailCode, verifyPhoneCode, resendVerification, isLoading, error, clearError } = useAuthStore();
   const navigate = useNavigate();
 
   const handleEmailVerify = async (e: React.FormEvent) => {
@@ -16,10 +16,10 @@ export default function Verify() {
     try {
       const result = await verifyEmailCode(emailCode);
       setEmailVerified(true);
-      if (true) {
-        setStep("done");
-      } else {
+      if (result?.needsPhone || result?.phoneVerificationRequired) {
         setStep("phone");
+      } else {
+        setStep("done");
       }
     } catch {}
   };
@@ -27,7 +27,7 @@ export default function Verify() {
   const handlePhoneVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const result = await verifyPhoneCode(phoneCode);
+      await verifyPhoneCode(phoneCode);
       setPhoneVerified(true);
       setStep("done");
     } catch {}
@@ -47,14 +47,16 @@ export default function Verify() {
             </div>
             <h2 className="text-2xl font-semibold text-white mb-2">Cuenta verificada</h2>
             <p className="text-gray-400 mb-6">Tu identidad ha sido confirmada. Ya puedes operar en BANCA NEN.</p>
-            <button onClick={() => navigate("/login")} className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold py-3 rounded-xl transition-colors">
-              Iniciar sesion
+            <button onClick={() => navigate("/dashboard")} className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold py-3 rounded-xl transition-colors">
+              Ir al dashboard
             </button>
           </div>
         </div>
       </div>
     );
   }
+
+  const stepDone = step === "email" ? emailVerified : phoneVerified;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
@@ -69,20 +71,20 @@ export default function Verify() {
           <div className="flex items-center gap-3 mb-8">
             <div className={`flex items-center gap-2 ${step === "email" ? "text-[#00d4aa]" : emailVerified ? "text-emerald-400" : "text-gray-500"}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${emailVerified ? "bg-emerald-500/20" : step === "email" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>
-                {emailVerified ? "?" : "1"}
+                {emailVerified ? "✓" : "1"}
               </div>
               <span className="text-sm">Email</span>
             </div>
             <div className={`flex-1 h-px ${emailVerified ? "bg-emerald-500/30" : "bg-white/10"}`} />
             <div className={`flex items-center gap-2 ${step === "phone" ? "text-[#00d4aa]" : phoneVerified ? "text-emerald-400" : "text-gray-500"}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${phoneVerified ? "bg-emerald-500/20" : step === "phone" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>
-                {phoneVerified ? "?" : "2"}
+                {phoneVerified ? "✓" : "2"}
               </div>
               <span className="text-sm">Telefono</span>
             </div>
             <div className={`flex-1 h-px ${phoneVerified ? "bg-emerald-500/30" : "bg-white/10"}`} />
-            <div className={`flex items-center gap-2 ${step === "done" ? "text-[#00d4aa]" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step === "done" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>3</div>
+            <div className={`flex items-center gap-2 ${stepDone ? "text-emerald-400" : "text-gray-500"}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${stepDone ? "bg-emerald-500/20" : "bg-white/5"}`}>3</div>
               <span className="text-sm">Listo</span>
             </div>
           </div>

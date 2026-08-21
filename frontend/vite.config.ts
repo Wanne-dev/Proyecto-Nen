@@ -11,6 +11,8 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true,
+    allowedHosts: true, // acepta cualquier host de preview (e2b.app, arena.site, etc.)
     proxy: {
       "/api": {
         target: "http://localhost:3000",
