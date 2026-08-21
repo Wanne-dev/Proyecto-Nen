@@ -1,4 +1,6 @@
-version: "3.8"
+# Nombre fijo del proyecto: asi Docker reconoce los mismos contenedores
+# aunque cambie el nombre de la carpeta (Proyecto-nen-main, Proyecto-Nen-pnpm, etc.)
+name: banca-nen
 
 services:
   postgres:
@@ -13,6 +15,12 @@ services:
       POSTGRES_DB: banca_nen
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U banca_nen -d banca_nen"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -22,6 +30,11 @@ services:
       - "6380:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:

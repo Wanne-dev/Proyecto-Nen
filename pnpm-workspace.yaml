@@ -1,0 +1,7 @@
+# Workspace de pnpm para BANCA NEN
+# Solo se listan los paquetes Node reales del monorepo.
+# - ia-service  -> es Python (requirements.txt), no entra
+# - mobile      -> su package.json todavia es un placeholder, se agregara cuando exista
+packages:
+  - backend
+  - frontend

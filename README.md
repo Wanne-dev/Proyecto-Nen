@@ -293,6 +293,7 @@ Usuario → UI → Hook/Context → Service → API → Backend → IA → BD �
 | **App Móvil** | React Native + Expo, TypeScript, React Navigation, expo-camera, expo-local-authentication, AsyncStorage, Firebase Cloud Messaging, APNs |
 | **IA/ML** | Python 3.11, FastAPI, TensorFlow (LSTM), Scikit-learn (Random Forest, XGBoost), SHAP, Prophet, Pandas, NumPy, Joblib |
 | **Base de Datos** | PostgreSQL 16, TimescaleDB 2.12, Redis 7.2, PostGIS (opcional) |
+| **Gestor de paquetes** | pnpm 9 (workspaces) |
 | **Infraestructura** | Docker, Docker Compose, Kubernetes (opcional), AWS (EC2, RDS, S3, ElastiCache), Cloudflare, Nginx, PM2 |
 | **Monitorización** | Prometheus + Grafana, ELK Stack, Alertmanager, Sentry |
 | **Seguridad** | TLS 1.3, AES-256-GCM, HSM, OWASP ZAP, Burp Suite, PCI DSS Level 1 (Wompi), SARLAFT (Colombia) |
@@ -433,10 +434,58 @@ banca-nen/
 ### Requisitos Previos
 
 - Node.js 20.x
+- **pnpm 9.x** (gestor de paquetes oficial del proyecto)
 - PostgreSQL 16
 - Redis 7.2
 - Python 3.11 (para IA)
 - Docker y Docker Compose (opcional)
+
+#### Instalar pnpm
+
+```bash
+# Opcion 1 (recomendada): corepack, viene incluido con Node 20
+corepack enable
+corepack prepare pnpm@9.15.4 --activate
+
+# Opcion 2
+npm install -g pnpm
+```
+
+Verifica con `pnpm -v` (debe mostrar 9.x).
+
+> ⚠️ **Este proyecto usa pnpm, no npm.** No ejecutes `npm install`: generaría
+> un `package-lock.json` que no corresponde al `pnpm-lock.yaml` versionado.
+
+#### Comandos equivalentes npm → pnpm
+
+| npm | pnpm |
+|-----|------|
+| `npm install` | `pnpm install` |
+| `npm install <paquete>` | `pnpm add <paquete>` |
+| `npm install -D <paquete>` | `pnpm add -D <paquete>` |
+| `npm uninstall <paquete>` | `pnpm remove <paquete>` |
+| `npm run <script>` | `pnpm <script>` |
+| `npx <comando>` | `pnpm dlx <comando>` |
+| `npm ci` | `pnpm install --frozen-lockfile` |
+
+#### Scripts disponibles desde la raíz
+
+| Comando | Qué hace |
+|---------|----------|
+| `pnpm install` | Instala dependencias de backend y frontend |
+| `pnpm dev` | Levanta backend y frontend en paralelo |
+| `pnpm dev:back` | Solo el backend (puerto 3000) |
+| `pnpm dev:front` | Solo el frontend (puerto 5173) |
+| `pnpm build:front` | Compila el frontend a producción |
+| `pnpm docker:up` | Levanta PostgreSQL y Redis |
+| `pnpm docker:down` | Apaga los contenedores |
+
+Para ejecutar algo dentro de un paquete puntual:
+
+```bash
+pnpm --filter banca-nen-backend <script>
+pnpm --filter banca-nen-frontend <script>
+```
 
 ### Pasos Rápidos
 
@@ -454,38 +503,51 @@ cp .env.example .env
 # Editar .env con tus credenciales (DB, Redis, Wompi, etc.)
 ```
 
-3. **Levantar servicios con Docker Compose**
+3. **Instalar dependencias (pnpm)**
+
+> Este proyecto usa **pnpm** como gestor de paquetes (no npm ni yarn).
+> Si no lo tienes: `npm install -g pnpm` o `corepack enable`.
+
+Un solo comando desde la raíz instala backend + frontend:
 
 ```bash
-docker-compose up -d
+pnpm install
 ```
 
-4. **Ejecutar migraciones y seed**
+4. **Levantar servicios con Docker Compose**
 
 ```bash
-cd backend
-npm run migrate
-npm run seed
+docker compose up -d
 ```
+
+Esto levanta PostgreSQL en el puerto `5433` y Redis en el `6380`.
 
 5. **Iniciar el backend**
 
 ```bash
-npm run dev
+pnpm dev:back
 ```
+
+> Nota: la base de datos se crea sola al arrancar (TypeORM `synchronize: true`),
+> por eso no hace falta un paso de migraciones en desarrollo.
 
 6. **Iniciar el frontend web**
 
 ```bash
-cd ../frontend
-npm run dev
+pnpm dev:front
+```
+
+O ambos a la vez, en paralelo:
+
+```bash
+pnpm dev
 ```
 
 7. **Iniciar la app móvil**
 
 ```bash
-cd ../mobile
-npx expo start
+cd mobile
+pnpm dlx expo start
 ```
 
 8. **Iniciar el servicio de IA**

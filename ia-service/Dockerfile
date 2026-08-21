@@ -1,2 +1,14 @@
-// Archivo: ia-service/Dockerfile
-// Propósito: Dockerfile para servicio IA
+# Archivo: ia-service/Dockerfile
+# Proposito: Dockerfile para servicio IA (Python / FastAPI)
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ ./src/
+
+EXPOSE 8000
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
