@@ -1,5 +1,7 @@
-﻿import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { getOrCreateWallet, getBalances, deposit, withdraw, getTransactions } from "../services/wallet.service";
+import { logAudit } from "../services/audit.service";
+import { AuditAction } from "../models/AuditLog";
 
 export async function getWallet(req: Request, res: Response, next: NextFunction) {
   try {
@@ -31,6 +33,10 @@ export async function depositFunds(req: Request, res: Response, next: NextFuncti
     const { currency, amount, description } = req.body;
     if (!currency || !amount || amount <= 0) return res.status(400).json({ success: false, message: "Currency y amount requeridos" });
     const result = await deposit(userId, currency, amount, description);
+    logAudit({
+      userId, action: AuditAction.DEPOSIT, entityType: "wallet", entityId: result.transaction?.id,
+      ipAddress: req.ip, details: `Depósito ${amount} ${currency}`, newValues: { amount, currency },
+    }).catch(() => {});
     res.json({ success: true, data: result });
   } catch (err) { next(err); }
 }
@@ -41,6 +47,10 @@ export async function withdrawFunds(req: Request, res: Response, next: NextFunct
     const { currency, amount, description } = req.body;
     if (!currency || !amount || amount <= 0) return res.status(400).json({ success: false, message: "Currency y amount requeridos" });
     const result = await withdraw(userId, currency, amount, description);
+    logAudit({
+      userId, action: AuditAction.WITHDRAWAL, entityType: "wallet", entityId: result.transaction?.id,
+      ipAddress: req.ip, details: `Retiro ${amount} ${currency}`, newValues: { amount, currency },
+    }).catch(() => {});
     res.json({ success: true, data: result });
   } catch (err: any) {
     if (err.message === "Saldo insuficiente") return res.status(400).json({ success: false, message: "Saldo insuficiente" });
