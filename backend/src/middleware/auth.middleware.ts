@@ -40,7 +40,7 @@ export const authenticate = async (
       throw new AppError("Usuario no encontrado", 401);
     }
 
-    if (user.status === "suspended") {
+    if (user.accountStatus === "suspended" || user.accountStatus === "blocked") {
       throw new AppError("Tu cuenta ha sido suspendida", 403);
     }
 

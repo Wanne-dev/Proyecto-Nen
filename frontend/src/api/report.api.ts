@@ -1,2 +1,3 @@
-// Archivo: frontend/src/api/report.api.ts
-// Prop�sito: Funciones API de reportes
+/* Cliente API — BANCA NEN (módulo reportes) */
+export { reportService as reportApi } from "../services/reports";
+export * from "../services/reports";

@@ -22,7 +22,7 @@ export default function Login() {
   const handle2FA = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await verify2FA(email, code2FA);
+      await verify2FA(email, password, code2FA);
       navigate("/dashboard");
     } catch {}
   };
@@ -70,7 +70,7 @@ export default function Login() {
           ) : (
             <>
               <h2 className="text-2xl font-semibold text-white mb-2">Verificacion 2FA</h2>
-              <p className="text-gray-400 text-sm mb-6">Se envio un codigo a tu email y telefono.</p>
+              <p className="text-gray-400 text-sm mb-6">Ingresa el codigo de 6 digitos de tu app autenticadora.</p>
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
                   <p className="text-red-400 text-sm">{error}</p>

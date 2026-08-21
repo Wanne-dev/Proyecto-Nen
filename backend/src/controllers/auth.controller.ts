@@ -1,10 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "../services/auth.service";
 import { AppError } from "../middleware/errorHandler.middleware";
+import { logAudit } from "../services/audit.service";
+import { AuditAction } from "../models/AuditLog";
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const result = await authService.registerUser(req.body);
+    logAudit({
+      userId: result.user?.id || null,
+      action: AuditAction.REGISTER,
+      entityType: "user",
+      entityId: result.user?.id,
+      ipAddress: req.ip,
+      details: "Registro de nueva cuenta: " + req.body.email,
+    }).catch(() => {});
     res.status(201).json({ status: "success", data: result });
   } catch (error) { next(error); }
 };
@@ -12,6 +22,14 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const result = await authService.loginUser(req.body);
+    logAudit({
+      userId: result.user?.id || null,
+      action: AuditAction.LOGIN,
+      entityType: "user",
+      entityId: result.user?.id,
+      ipAddress: req.ip,
+      details: "Inicio de sesión exitoso: " + req.body.email,
+    }).catch(() => {});
     res.status(200).json({ status: "success", data: result });
   } catch (error) { next(error); }
 };

@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import speakeasy from "speakeasy";
 import { AppDataSource } from "../config/database";
 import { User, UserRole, AccountStatus, DocumentType } from "../models/User";
 import { AppError } from "../middleware/errorHandler.middleware";
-import { sendVerificationEmail, sendPasswordResetEmail, send2FACodeEmail } from "../config/email";
-import { sendVerificationSMS, sendPasswordResetSMS } from "../config/sms";
+import { sendVerificationEmail, sendPasswordResetEmail } from "../config/email";
+import { sendVerificationSMS } from "../config/sms";
 import logger from "../config/logger";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret";
@@ -28,9 +29,7 @@ const isAdult = (dateOfBirth: string): boolean => {
   const birth = new Date(dateOfBirth);
   let age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
   return age >= 18;
 };
 
@@ -41,10 +40,20 @@ const userToJSON = (user: User) => ({
   lastName: user.lastName,
   role: user.role,
   kycStatus: user.kycStatus,
+  accountStatus: user.accountStatus,
   isVerified: user.isVerified,
   emailVerified: user.emailVerified,
   phoneVerified: user.phoneVerified,
-  accountStatus: user.accountStatus,
+  twoFactorEnabled: user.twoFactorEnabled,
+  phone: user.phone,
+  documentType: user.documentType,
+  documentNumber: user.documentNumber,
+  dateOfBirth: user.dateOfBirth,
+  country: user.country,
+  timezone: user.timezone,
+  preferredCurrency: user.preferredCurrency,
+  createdAt: user.createdAt,
+  lastLoginAt: user.lastLoginAt,
 });
 
 export const registerUser = async (data: {
@@ -121,7 +130,12 @@ export const registerUser = async (data: {
     logger.warn("No se pudo enviar SMS: " + error);
   }
 
-  logger.info("Nuevo usuario registrado: " + savedUser.email);
+  /* Bienvenida + notificación */
+  try {
+    const { createNotification } = await import("./admin.service");
+    createNotification(savedUser.id, "system", "Bienvenido a BANCA NEN 🎉",
+      "Tu cuenta fue creada exitosamente. Ya puedes depositar e invertir.").catch(() => {});
+  } catch { /* ignore */ }
 
   return {
     user: userToJSON(savedUser),
@@ -135,29 +149,43 @@ export const loginUser = async (data: { email: string; password: string; twoFact
   const userRepo = AppDataSource.getRepository(User);
   const user = await userRepo.findOne({ where: { email: data.email } });
 
-  if (!user) {
-    throw new AppError("Credenciales invalidas", 401);
-  }
+  if (!user) throw new AppError("Credenciales invalidas", 401);
+  if (!user.isVerified) throw new AppError("Debes verificar tu email antes de iniciar sesion", 403);
+  if (user.accountStatus === AccountStatus.SUSPENDED) throw new AppError("Tu cuenta ha sido suspendida. Contacta soporte.", 403);
 
-  if (!user.isVerified) {
-    throw new AppError("Debes verificar tu email antes de iniciar sesion", 403);
-  }
-
-  if (user.accountStatus === AccountStatus.SUSPENDED) {
-    throw new AppError("Tu cuenta ha sido suspendida. Contacta soporte.", 403);
-  }
-
-  const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
-
-  if (!isPasswordValid) {
-    user.failedLoginAttempts += 1;
-    if (user.failedLoginAttempts >= 5) {
-      user.accountStatus = AccountStatus.SUSPENDED;
+  /* Si 2FA activo: primero exigir credenciales, luego el código TOTP */
+  if (user.twoFactorEnabled) {
+    const isPasswordValid = await bcrypt.compare(data.password || "", user.passwordHash);
+    if (!isPasswordValid) {
+      user.failedLoginAttempts += 1;
+      if (user.failedLoginAttempts >= 5) {
+        user.accountStatus = AccountStatus.SUSPENDED;
+        await userRepo.save(user);
+        throw new AppError("Cuenta bloqueada por multiples intentos fallidos.", 423);
+      }
       await userRepo.save(user);
-      throw new AppError("Cuenta bloqueada por multiples intentos fallidos.", 423);
+      throw new AppError("Credenciales invalidas. Intentos restantes: " + (5 - user.failedLoginAttempts), 401);
     }
-    await userRepo.save(user);
-    throw new AppError("Credenciales invalidas. Intentos restantes: " + (5 - user.failedLoginAttempts), 401);
+    if (!data.twoFactorCode) {
+      return { user: userToJSON(user), requiresTwoFactor: true, message: "Se requiere codigo 2FA" };
+    }
+    const secret = user.twoFactorSecret;
+    const verified = secret
+      ? speakeasy.totp.verify({ secret, encoding: "base32", token: data.twoFactorCode, window: 1 })
+      : false;
+    if (!verified) throw new AppError("Codigo 2FA invalido", 401);
+  } else {
+    const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
+    if (!isPasswordValid) {
+      user.failedLoginAttempts += 1;
+      if (user.failedLoginAttempts >= 5) {
+        user.accountStatus = AccountStatus.SUSPENDED;
+        await userRepo.save(user);
+        throw new AppError("Cuenta bloqueada por multiples intentos fallidos.", 423);
+      }
+      await userRepo.save(user);
+      throw new AppError("Credenciales invalidas. Intentos restantes: " + (5 - user.failedLoginAttempts), 401);
+    }
   }
 
   user.failedLoginAttempts = 0;
@@ -170,6 +198,114 @@ export const loginUser = async (data: { email: string; password: string; twoFact
   logger.info("Usuario logueado: " + user.email);
 
   return { user: userToJSON(user), token, refreshToken };
+};
+
+export const verifyEmailCode = async (userId: string, code: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new AppError("Usuario no encontrado", 404);
+
+  let stored: any = {};
+  try { stored = JSON.parse(user.twoFactorSecret || "{}"); } catch { /* ignore */ }
+
+  if (user.emailVerified) return { emailVerified: true, fullyVerified: user.isVerified };
+  if (stored.emailCode !== code) throw new AppError("Codigo de email incorrecto", 400);
+
+  user.emailVerified = true;
+  user.isVerified = user.phoneVerified ? true : false;
+  await userRepo.save(user);
+  return { emailVerified: true, fullyVerified: user.isVerified, needsPhone: !user.phoneVerified };
+};
+
+export const verifyPhoneCode = async (userId: string, code: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new AppError("Usuario no encontrado", 404);
+
+  let stored: any = {};
+  try { stored = JSON.parse(user.twoFactorSecret || "{}"); } catch { /* ignore */ }
+
+  if (user.phoneVerified) return { phoneVerified: true, fullyVerified: user.isVerified };
+  if (stored.phoneCode !== code) throw new AppError("Codigo de telefono incorrecto", 400);
+
+  user.phoneVerified = true;
+  user.isVerified = user.emailVerified ? true : false;
+  await userRepo.save(user);
+  return { phoneVerified: true, fullyVerified: user.isVerified };
+};
+
+export const resendVerificationCodes = async (userId: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new AppError("Usuario no encontrado", 404);
+
+  let stored: any = {};
+  try { stored = JSON.parse(user.twoFactorSecret || "{}"); } catch { /* ignore */ }
+  const emailCode = user.emailVerified ? stored.emailCode : generateCode();
+  const phoneCode = user.phoneVerified ? stored.phoneCode : generateCode();
+  user.twoFactorSecret = JSON.stringify({ emailCode, phoneCode });
+  await userRepo.save(user);
+
+  if (!user.emailVerified) sendVerificationEmail(user.email, emailCode).catch(() => {});
+  if (!user.phoneVerified) sendVerificationSMS(user.phone, phoneCode).catch(() => {});
+  return { success: true };
+};
+
+export const forgotPassword = async (email: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { email } });
+  if (!user) return { success: true }; // no revelar existencia
+
+  const token = generateCode() + Math.random().toString(36).slice(2, 8);
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000);
+  await userRepo.save(user);
+
+  try {
+    await sendPasswordResetEmail(user.email, token);
+  } catch (error) {
+    logger.warn("No se pudo enviar email de reset: " + error);
+  }
+  return { success: true };
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { resetPasswordToken: token } });
+  if (!user || !user.resetPasswordExpires || user.resetPasswordExpires.getTime() < Date.now()) {
+    throw new AppError("Token invalido o expirado", 400);
+  }
+  user.passwordHash = await bcrypt.hash(password, 12);
+  user.resetPasswordToken = "";
+  user.resetPasswordExpires = null;
+  await userRepo.save(user);
+  return { success: true };
+};
+
+export const enable2FA = async (userId: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new AppError("Usuario no encontrado", 404);
+
+  const secret = speakeasy.generateSecret({ name: "BANCA NEN (" + user.email + ")" });
+  user.twoFactorSecret = secret.base32;
+  user.twoFactorEnabled = true;
+  await userRepo.save(user);
+  return {
+    secret: secret.base32,
+    otpauthUrl: secret.otpauth_url,
+    qrCodeUrl: "otpauth://totp/BANCA%20NEN:" + encodeURIComponent(user.email) + "?secret=" + secret.base32 + "&issuer=BANCA%20NEN",
+  };
+};
+
+export const disable2FA = async (userId: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new AppError("Usuario no encontrado", 404);
+  user.twoFactorEnabled = false;
+  user.twoFactorSecret = "";
+  await userRepo.save(user);
+  return { success: true };
 };
 
 export const getProfile = async (userId: string) => {
