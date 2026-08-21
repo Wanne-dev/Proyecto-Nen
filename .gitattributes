@@ -1,1 +1,4 @@
 * text=auto
+
+# Los scripts .bat deben conservar CRLF en Windows
+*.bat text eol=crlf

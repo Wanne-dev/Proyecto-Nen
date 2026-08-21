@@ -1,0 +1,25 @@
+{
+  "name": "banca-nen",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BANCA NEN - Monorepo (backend + frontend + ia-service)",
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev:back": "pnpm --filter banca-nen-backend dev",
+    "dev:front": "pnpm --filter banca-nen-frontend dev",
+    "dev": "pnpm --parallel --filter banca-nen-backend --filter banca-nen-frontend dev",
+    "build:back": "pnpm --filter banca-nen-backend build",
+    "build:front": "pnpm --filter banca-nen-frontend build",
+    "build": "pnpm --filter banca-nen-frontend build",
+    "start:back": "pnpm --filter banca-nen-backend start",
+    "lint": "pnpm --filter banca-nen-frontend lint",
+    "test": "pnpm --filter banca-nen-frontend test",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules"
+  }
+}

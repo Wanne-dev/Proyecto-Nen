@@ -1,16 +1,50 @@
-version: '3.8'
 services:
   backend:
-    build: ./backend
+    build:
+      # El contexto es la raiz porque el workspace de pnpm necesita
+      # pnpm-lock.yaml y pnpm-workspace.yaml
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+    depends_on:
+      - postgres
+      - redis
+
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
-      - "5173:5173"
+      - "5173:80"
+    depends_on:
+      - backend
+
   ia-service:
-    build: ./ia-service
+    build:
+      context: ./ia-service
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: banca_nen
+      POSTGRES_PASSWORD: banca_nen_secret
+      POSTGRES_DB: banca_nen
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
