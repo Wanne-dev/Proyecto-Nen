@@ -1,14 +1,26 @@
-﻿import { AppDataSource } from "../config/database";
+import { AppDataSource } from "../config/database";
 import { Wallet, WalletType } from "../models/Wallet";
 import { WalletBalance, Currency } from "../models/WalletBalance";
 import { Transaction } from "../models/Transaction";
 import { User } from "../models/User";
 import { Between, FindOptionsWhere } from "typeorm";
+import { getPrice } from "./market-client";
+import { createNotification } from "./admin.service";
 
 const walletRepo = () => AppDataSource.getRepository(Wallet);
 const balanceRepo = () => AppDataSource.getRepository(WalletBalance);
 const txRepo = () => AppDataSource.getRepository(Transaction);
 const userRepo = () => AppDataSource.getRepository(User);
+
+/* Tasa USD en vivo (best-effort, cacheada 60s) */
+async function resolveUsdRate(currency: string): Promise<number> {
+  if (currency === Currency.USD) return 1;
+  const price = await getPrice(currency as string);
+  if (price && price > 0) return price;
+  /* Fallback: tasas de referencia (USD por 1 unidad de la moneda) */
+  const fallback: Record<string, number> = { COP: 1 / 3950, EUR: 0.92, BTC: 67000, ETH: 3500, USDC: 1 };
+  return fallback[currency] || 0;
+}
 
 /* Obtener o crear wallet del usuario */
 export async function getOrCreateWallet(userId: string) {
@@ -39,21 +51,26 @@ export async function deposit(userId: string, currency: string, amount: number, 
   const walletId = walletData.id;
   const curr = currency.toUpperCase() as any;
   let balance = await balanceRepo().findOne({ where: { walletId, currency: curr } as any });
+  const usdRate = await resolveUsdRate(curr);
   if (!balance) {
-    balance = balanceRepo().create({ walletId, currency: curr, balance: 0, lockedAmount: 0, usdRate: curr === Currency.USD ? 1 : 0 });
+    balance = balanceRepo().create({ walletId, currency: curr, balance: 0, lockedAmount: 0, usdRate });
     balance = await balanceRepo().save(balance);
+  } else {
+    balance.usdRate = usdRate;
+    await balanceRepo().save(balance);
   }
   balance.balance = Number(balance.balance) + amount;
   await balanceRepo().save(balance);
   const refId = "DEP-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
   const tx = txRepo().create({
     walletId, userId, type: "deposit" as any, status: "completed" as any,
-    amount, currency: curr, amountUsd: curr === Currency.USD ? amount : 0,
+    amount, currency: curr, amountUsd: Math.round(amount * usdRate * 100) / 100,
     fee: 0, feeCurrency: "USD", description: description || "Deposito",
     referenceId: refId,
   });
   await txRepo().save(tx);
   await updateTotalBalance(walletId);
+  createNotification(userId, "transaction", "Depósito confirmado", `Se acreditaron ${amount} ${curr} a tu billetera.`).catch(() => {});
   return { balance: Number(balance.balance), transaction: tx };
 }
 
@@ -75,6 +92,7 @@ export async function withdraw(userId: string, currency: string, amount: number,
   });
   await txRepo().save(tx);
   await updateTotalBalance(walletId);
+  createNotification(userId, "transaction", "Retiro procesado", `Se enviaron ${amount} ${curr} a tu cuenta bancaria.`).catch(() => {});
   return { balance: Number(balance.balance), transaction: tx };
 }
 

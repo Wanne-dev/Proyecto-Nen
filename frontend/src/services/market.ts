@@ -1,47 +1,66 @@
-﻿import api from './api';
+/* ============================================================
+   SERVICIO DE MERCADO — BANCA NEN (proxy CoinGecko del backend)
+   ============================================================ */
+import api, { unwrap } from "../api/client";
 
-export interface Coin {
+export interface MarketCoin {
   id: string;
   symbol: string;
   name: string;
   image: string;
   current_price: number;
-  price_change_percentage_24h: number;
   market_cap: number;
   total_volume: number;
-  sparkline_in_7d?: { price: number[] };
+  price_change_percentage_24h: number;
+  price_change_percentage_7d_in_currency?: number;
   high_24h: number;
   low_24h: number;
+  market_cap_rank: number;
+  color?: string;
 }
 
-export interface MarketOverview {
-  total_market_cap: Record<string, number>;
-  total_volume: Record<string, number>;
-  market_cap_percentage: Record<string, number>;
+export interface OHLCPoint {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
 }
 
 export const marketService = {
-  getTopCrypto: async (page: number = 1, perPage: number = 50): Promise<Coin[]> => {
-    const res = await api.get('/market/crypto', {
-      params: { page, perPage, currency: 'usd' },
+  async getTopCryptos(limit = 30): Promise<MarketCoin[]> {
+    const res = await api.get("/market/markets", {
+      params: {
+        vs_currency: "usd",
+        order: "market_cap_desc",
+        per_page: limit,
+        page: 1,
+        sparkline: "false",
+        price_change_percentage: "24h,7d",
+      },
     });
-    return res.data.data?.coins || res.data.data || [];
+    return (res.data || []) as MarketCoin[];
   },
 
-  getCryptoDetail: async (id: string): Promise<any> => {
-    const res = await api.get(`/market/crypto/${id}`);
-    return res.data.data;
+  async getOHLC(coinId: string, days: number): Promise<OHLCPoint[]> {
+    const res = await api.get(`/market/ohlc/${coinId}`, { params: { vs_currency: "usd", days } });
+    const raw: number[][] = res.data || [];
+    if (!Array.isArray(raw)) return [];
+    return raw.map(([ts, o, h, l, c]) => ({
+      time: Math.floor(ts / 1000),
+      open: o, high: h, low: l, close: c,
+    }));
   },
 
-  getMarketOverview: async (): Promise<MarketOverview> => {
-    const res = await api.get('/market/overview');
-    return res.data.data;
-  },
-
-  getChart: async (id: string, timeframe: string = '1d'): Promise<any> => {
-    const res = await api.get(`/market/crypto/${id}/chart`, {
-      params: { timeframe },
-    });
-    return res.data.data;
+  async getCoinDetail(coinId: string): Promise<any> {
+    const res = await api.get(`/market/coin/${coinId}`);
+    return res.data;
   },
 };
+
+export function getTimeframeDays(tf: string): number {
+  const map: Record<string, number> = {
+    "1M": 1, "5M": 1, "15M": 1, "1H": 1, "4H": 7, "1D": 30, "1W": 90, "1MO": 365,
+  };
+  return map[tf] || 1;
+}

@@ -1,2 +1,3 @@
-// Archivo: frontend/src/api/market.api.ts
-// Prop�sito: Funciones API de mercado
+/* Cliente API — BANCA NEN (módulo mercado) */
+export { marketService as marketApi } from "../services/market";
+export * from "../services/market";

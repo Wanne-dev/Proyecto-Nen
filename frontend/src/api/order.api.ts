@@ -1,2 +1,3 @@
-// Archivo: frontend/src/api/order.api.ts
-// Propósito: Funciones API de órdenes
+/* Cliente API â€” BANCA NEN (mÃ³dulo Ã³rdenes) */
+export { orderService as orderApi } from "../services/orders";
+export * from "../services/orders";

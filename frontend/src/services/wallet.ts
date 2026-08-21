@@ -1,70 +1,129 @@
-﻿const BASE = "/api/v1";
+/* ============================================================
+   SERVICIO DE BILLETERA — BANCA NEN (API real)
+   ============================================================ */
+import api, { unwrap } from "../api/client";
 
 export interface WalletBalance {
   id: string;
+  walletId: string;
   currency: string;
-  balance: string;
-  lockedAmount: string;
-  usdRate: string;
+  balance: number;
+  lockedAmount: number;
+  usdRate: number;
+  usdRateUpdatedAt?: string;
 }
 
 export interface WalletData {
   id: string;
   userId: string;
   type: string;
-  totalBalanceUsd: string;
+  totalBalanceUsd: number;
   isActive: boolean;
+  dailyWithdrawalLimit: number;
+  dailyWithdrawn: number;
   balances: WalletBalance[];
+  createdAt?: string;
 }
 
 export interface Transaction {
   id: string;
   type: string;
   status: string;
-  amount: string;
+  amount: number;
   currency: string;
-  fee: string;
+  amountUsd: number;
+  fee: number;
+  feeCurrency: string;
   description: string;
   referenceId: string;
   createdAt: string;
 }
 
-function authHeaders(token: string) {
-  return { "Content-Type": "application/json", Authorization: "Bearer " + token };
+function toNumber(v: any): number {
+  const n = Number(v);
+  return isFinite(n) ? n : 0;
 }
 
-export async function getWallet(token: string): Promise<WalletData> {
-  const res = await fetch(BASE + "/wallet", { headers: authHeaders(token) });
-  if (!res.ok) throw new Error("Wallet error: " + res.status);
-  const json = await res.json();
-  return json.data;
+function normalizeWallet(raw: any): WalletData {
+  return {
+    id: raw.id,
+    userId: raw.userId,
+    type: raw.type,
+    totalBalanceUsd: toNumber(raw.totalBalanceUsd),
+    isActive: raw.isActive,
+    dailyWithdrawalLimit: toNumber(raw.dailyWithdrawalLimit),
+    dailyWithdrawn: toNumber(raw.dailyWithdrawn),
+    createdAt: raw.createdAt,
+    balances: (raw.balances || []).map((b: any) => ({
+      id: b.id,
+      walletId: b.walletId,
+      currency: b.currency,
+      balance: toNumber(b.balance),
+      lockedAmount: toNumber(b.lockedAmount),
+      usdRate: toNumber(b.usdRate),
+      usdRateUpdatedAt: b.usdRateUpdatedAt,
+    })),
+  };
 }
 
-export async function depositFunds(token: string, currency: string, amount: number, description?: string) {
-  const res = await fetch(BASE + "/wallet/deposit", {
-    method: "POST", headers: authHeaders(token),
-    body: JSON.stringify({ currency, amount, description }),
-  });
-  if (!res.ok) throw new Error("Deposit error: " + res.status);
-  const json = await res.json();
-  return json.data;
+function normalizeTx(raw: any): Transaction {
+  return {
+    id: raw.id,
+    type: raw.type,
+    status: raw.status,
+    amount: toNumber(raw.amount),
+    currency: raw.currency,
+    amountUsd: toNumber(raw.amountUsd),
+    fee: toNumber(raw.fee),
+    feeCurrency: raw.feeCurrency || "USD",
+    description: raw.description || "",
+    referenceId: raw.referenceId,
+    createdAt: raw.createdAt,
+  };
 }
 
-export async function withdrawFunds(token: string, currency: string, amount: number, description?: string) {
-  const res = await fetch(BASE + "/wallet/withdraw", {
-    method: "POST", headers: authHeaders(token),
-    body: JSON.stringify({ currency, amount, description }),
-  });
-  if (!res.ok) {
-    try { const json = await res.json(); throw new Error(json.message || "Withdraw error"); } catch (e) { throw e; }
-  }
-  const json = await res.json();
-  return json.data;
-}
+export const walletService = {
+  async getWallet(): Promise<WalletData> {
+    const res = await api.get("/wallet");
+    return normalizeWallet(unwrap<any>(res.data));
+  },
 
-export async function getTransactions(token: string, page = 1, limit = 20): Promise<Transaction[]> {
-  const res = await fetch(BASE + "/wallet/transactions?page=" + page + "&limit=" + limit, { headers: authHeaders(token) });
-  if (!res.ok) throw new Error("Transactions error: " + res.status);
-  const json = await res.json();
-  return json.data;
+  async getBalances(): Promise<WalletBalance[]> {
+    const res = await api.get("/wallet/balances");
+    const raw = unwrap<any[]>(res.data) || [];
+    return raw.map((b) => ({
+      id: b.id, walletId: b.walletId, currency: b.currency,
+      balance: toNumber(b.balance), lockedAmount: toNumber(b.lockedAmount), usdRate: toNumber(b.usdRate),
+    }));
+  },
+
+  async deposit(currency: string, amount: number, description?: string) {
+    const res = await api.post("/wallet/deposit", { currency, amount, description });
+    return unwrap<any>(res.data);
+  },
+
+  async withdraw(currency: string, amount: number, description?: string) {
+    const res = await api.post("/wallet/withdraw", { currency, amount, description });
+    return unwrap<any>(res.data);
+  },
+
+  async getTransactions(page = 1, limit = 20): Promise<Transaction[]> {
+    const res = await api.get("/wallet/transactions", { params: { page, limit } });
+    const raw = unwrap<any[]>(res.data) || [];
+    return raw.map(normalizeTx);
+  },
+};
+
+/* ---- Compatibilidad con páginas existentes (token se lee del store) ---- */
+export async function getWallet(_token?: string): Promise<WalletData> {
+  return walletService.getWallet();
+}
+export async function getTransactions(_token?: string, page = 1, limit = 20): Promise<Transaction[]> {
+  return walletService.getTransactions(page, limit);
+}
+export async function depositFunds(_token?: string, currency?: string, amount?: number, description?: string) {
+  return walletService.deposit(currency || "USD", amount || 0, description);
+}
+export async function withdrawFunds(_token?: string, currency?: string, amount?: number, description?: string) {
+  return walletService.withdraw(currency || "USD", amount || 0, description);
 }
