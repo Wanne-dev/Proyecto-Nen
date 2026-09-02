@@ -1,5 +1,4 @@
-﻿# Restricciones del Proyecto — BANCA NEN (FinPredictor Pro)
-
+﻿# Restricciones del Proyecto — BANCA NEN 
 <!--
 
   ¿Qué? Restricciones globales que gobiernan todo el proyecto.
