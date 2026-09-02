@@ -1,0 +1,12 @@
+node_modules
+dist
+logs
+*.log
+.env
+.env.*
+!.env.example
+.git
+tests
+*.md
+create-models.ps1
+fix-env.ps1

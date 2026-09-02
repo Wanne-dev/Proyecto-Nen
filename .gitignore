@@ -26,3 +26,6 @@ redis-data/
 # Lockfiles de otros gestores: este proyecto usa pnpm-lock.yaml
 package-lock.json
 yarn.lock
+
+# Claves de correo - no subir
+backend/.env
