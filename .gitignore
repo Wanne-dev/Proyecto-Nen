@@ -29,3 +29,25 @@ yarn.lock
 
 # Claves de correo - no subir
 backend/.env
+
+# Backups locales - no van al repo
+_backup-*/
+*.bak
+
+# Dependencias y builds
+node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# IDE / SO
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
