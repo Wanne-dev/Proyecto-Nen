@@ -1,49 +1,107 @@
+# ──────────────────────────────────────────────────────────────
+# BANCA NEN — Stack de producción (variante mínima de despliegue)
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Igual que docker-compose.yml pero pensado para un servidor:
+# - sin puertos publicados de la BD/Redis (solo red interna)
+# - sin mapeo de volúmenes de código (usa imágenes construidas)
+# - healthchecks y políticas de reinicio
+# ──────────────────────────────────────────────────────────────
+name: banca-nen-prod
+
 services:
-  backend:
-    build:
-      # El contexto es la raiz porque el workspace de pnpm necesita
-      # pnpm-lock.yaml y pnpm-workspace.yaml
-      context: .
-      dockerfile: backend/Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - postgres
-      - redis
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
-
-  ia-service:
-    build:
-      context: ./ia-service
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: banca_nen
-      POSTGRES_PASSWORD: banca_nen_secret
-      POSTGRES_DB: banca_nen
+      POSTGRES_USER: ${POSTGRES_USER:-banca_nen}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-banca_nen_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-banca_nen}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-banca_nen} -d ${POSTGRES_DB:-banca_nen}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      PORT: "3000"
+      HOST: "0.0.0.0"
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${POSTGRES_USER:-banca_nen}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-banca_nen_secret}
+      DB_NAME: ${POSTGRES_DB:-banca_nen}
+      DB_SSL: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET para producción}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-console}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-BANCA NEN <onboarding@resend.dev>}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+  ia-service:
+    build:
+      context: ./ia-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
 
 volumes:
   postgres_data:

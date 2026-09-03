@@ -33,24 +33,24 @@ export default function CurrencyList({ wallet, onSelectCurrency, selectedCurrenc
               border: "1px solid " + (selected ? C.gold + "66" : C.border),
             }}
           >
-            <div style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: meta.color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: meta.color, flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: meta.color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 800, color: meta.color, flexShrink: 0 }}>
               {meta.icon}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{b.currency}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{amount.toLocaleString(undefined, { maximumFractionDigits: b.currency === "BTC" || b.currency === "ETH" ? 6 : 2 })}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{b.currency}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{amount.toLocaleString(undefined, { maximumFractionDigits: b.currency === "BTC" || b.currency === "ETH" ? 6 : 2 })}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 3 }}>
-                <span style={{ fontSize: 9, color: C.t3 }}>{meta.name}</span>
-                <span style={{ fontSize: 9, color: C.t2 }}>≈ {usd.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 })}</span>
+                <span style={{ fontSize: 11, color: C.t3 }}>{meta.name}</span>
+                <span style={{ fontSize: 11, color: C.t2 }}>≈ {usd.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 })}</span>
               </div>
               <div style={{ height: 3, borderRadius: 999, backgroundColor: C.border, marginTop: 6, overflow: "hidden" }}>
                 <div style={{ height: "100%", width: pct + "%", backgroundColor: meta.color, borderRadius: 999 }} />
               </div>
             </div>
             {locked > 0 && (
-              <span style={{ fontSize: 8, color: C.gold, backgroundColor: C.gold + "12", padding: "2px 6px", borderRadius: 999, whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 10, color: C.gold, backgroundColor: C.gold + "12", padding: "2px 6px", borderRadius: 999, whiteSpace: "nowrap" }}>
                 {locked} congelado
               </span>
             )}

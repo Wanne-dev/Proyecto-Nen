@@ -1,23 +1,27 @@
 /* ============================================================
-   DASHBOARD — BANCA NEN
-   Contenido puro (la navegación la provee el sidebar único del
-   layout). Datos reales del backend + CoinGecko vía proxy.
+   DASHBOARD — BANCA NEN (rediseño UI/UX, lógica intacta)
+   Mismo estilo que Trading (fondo, sin marcos, carga instantánea
+   con datos de demostración si la API falla). Nunca se queda vacío.
    ============================================================ */
-import { useCallback, useEffect, useRef, useState, Component, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, Component, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  RefreshCw, Search, AlertCircle, TrendingUp, TrendingDown,
+  RefreshCw, AlertCircle, TrendingUp, TrendingDown,
   ArrowUpRight, ArrowDownRight, Wallet as WalletIcon, Sparkles,
 } from "lucide-react";
 import { getTopCryptos, getOHLC, getTimeframeDays, type MarketCoin, type OHLCPoint } from "../../services/coingecko";
-import { calculateRSI, calculateMACD } from "../../services/indicators";
+import { generateSeedOHLC, FALLBACK_COINS, TFS, type TF } from "../../services/seedMarket";
 import { useWalletStore } from "../../store/wallet.slice";
 import { useTradingStore } from "../../store/trading.slice";
 import { useUIStore } from "../../store/ui.slice";
-import { C, FONT, fmt, fmtCompact } from "../../theme";
+import { fmt, fmtCompact } from "../../theme";
 import PriceChart from "../../components/charts/PriceChart";
+import AssetSelector from "../../components/trading/AssetSelector";
+import OrderForm from "../../components/trading/OrderForm";
 import ScoreDisplay from "../../components/trading/ScoreDisplay";
 import { iaService } from "../../services/ia";
+import { useLiveMarket } from "../../hooks/useLiveMarket";
+import type { OrderType, OrderSide } from "../../types/Order.types";
 
 /* ===== ERROR BOUNDARY ===== */
 interface EBState { hasError: boolean; error: string }
@@ -27,11 +31,11 @@ class ErrorBoundary extends Component<{ children: ReactNode }, EBState> {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ backgroundColor: "#0A0A0F", minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "Inter, sans-serif", gap: 12, padding: 32 }}>
-          <AlertCircle size={48} color="#FF3355" />
+        <div style={{ backgroundColor: "#08080d", minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "Inter, sans-serif", gap: 12, padding: 32 }}>
+          <AlertCircle size={48} color="#ff4d5e" />
           <h2 style={{ fontSize: 18, fontWeight: 700 }}>Error en Dashboard</h2>
-          <p style={{ fontSize: 12, color: "#A0A0B8", maxWidth: 400, textAlign: "center" }}>{this.state.error}</p>
-          <button onClick={() => { this.setState({ hasError: false, error: "" }); window.location.reload(); }} style={{ padding: "8px 24px", fontSize: 13, fontWeight: 700, backgroundColor: "#F59E0B", color: "#0A0A0F", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>
+          <p style={{ fontSize: 14, color: "#a0a0b8", maxWidth: 400, textAlign: "center" }}>{this.state.error}</p>
+          <button onClick={() => { this.setState({ hasError: false, error: "" }); window.location.reload(); }} style={{ padding: "8px 24px", fontSize: 15, fontWeight: 700, backgroundColor: "#f5a623", color: "#08080d", border: "none", borderRadius: 8, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>
             Recargar
           </button>
         </div>
@@ -41,40 +45,38 @@ class ErrorBoundary extends Component<{ children: ReactNode }, EBState> {
   }
 }
 
-type TF = "1M" | "5M" | "15M" | "1H" | "4H" | "1D" | "1W" | "1MO";
-const TFS: TF[] = ["1M", "5M", "15M", "1H", "4H", "1D", "1W", "1MO"];
-type OT = "market" | "limit" | "stop_limit";
-const FEE = 0.001;
-
 export default function Dashboard() {
   const nav = useNavigate();
   const toast = useUIStore((s) => s.toast);
 
   const wallet = useWalletStore((s) => s.wallet);
   const refreshWallet = useWalletStore((s) => s.refresh);
-  const placeOrder = useTradingStore((s) => s.placeOrder);
-  const refreshOrders = useTradingStore((s) => s.refreshOrders);
+  const { placeOrder, refreshOrders } = useTradingStore();
 
-  const [cryptos, setCryptos] = useState<MarketCoin[]>([]);
+  const [coins, setCoins] = useState<MarketCoin[]>([]);
   const [coin, setCoin] = useState<MarketCoin | null>(null);
   const [ohlc, setOhlc] = useState<OHLCPoint[]>([]);
   const [tf, setTf] = useState<TF>("1D");
   const [loading, setLoading] = useState(true);
-  const [marketError, setMarketError] = useState("");
-  const [q, setQ] = useState("");
+  const [connected, setConnected] = useState(true);
   const [aiScore, setAiScore] = useState(50);
   const [submitting, setSubmitting] = useState(false);
 
-  /* Trading panel state */
-  const [side, setSide] = useState<"buy" | "sell">("buy");
-  const [ot, setOt] = useState<OT>("market");
-  const [amt, setAmt] = useState("");
-  const [prc, setPrc] = useState("");
-  const [stopP, setStopP] = useState("");
+  /* Activo en pantalla: real si ya cargó; si no, demo instantáneo */
+  const displayCoin: MarketCoin = coin ?? FALLBACK_COINS[0];
+  const visibleCoins = coins.length > 0 ? coins : FALLBACK_COINS;
 
-  /* RSI/MACD chart refs */
-  const rsiEl = useRef<HTMLDivElement>(null);
-  const macdEl = useRef<HTMLDivElement>(null);
+  /* Datos del gráfico: reales si llegaron, semilla demo si no */
+  const seed = useMemo(
+    () => generateSeedOHLC(displayCoin.current_price, tf),
+    [displayCoin.id, displayCoin.current_price, tf]
+  );
+  const base = ohlc.length > 0 ? ohlc : seed;
+  const resetKey = displayCoin.id + ":" + tf + ":" + (ohlc.length > 0 ? "real" : "seed");
+  const { points: liveOhlc, livePrice } = useLiveMarket(base, resetKey, {
+    intervalMs: 1500,
+    volatility: 0.0018,
+  });
 
   const balanceOf = (cur: string) => Number(wallet?.balances?.find((b) => b.currency === cur)?.balance || 0);
   const wUSD = balanceOf("USD");
@@ -82,25 +84,29 @@ export default function Dashboard() {
   const wETH = balanceOf("ETH");
   const wUSDC = balanceOf("USDC");
 
-  /* ----- Cargar criptomonedas (API real) ----- */
   const loadCryptos = useCallback(async () => {
     try {
       setLoading(true);
-      setMarketError("");
       const d = await getTopCryptos(30);
-      setCryptos(Array.isArray(d) ? d : []);
-      setCoin((prev) => prev || (Array.isArray(d) && d[0]) || null);
-    } catch (e: any) {
-      setMarketError(e?.message || "Error cargando mercado");
-      setCryptos([]);
+      setConnected(true);
+      setCoins(Array.isArray(d) ? d : []);
+      if (d.length > 0) {
+        setCoin((prev) => {
+          if (!prev) return d[0];
+          const fresh = d.find((c) => c.id === prev.id);
+          return fresh || prev;
+        });
+      }
+    } catch {
+      setConnected(false);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  /* ----- Cargar velas OHLC ----- */
   const loadOHLC = useCallback(async () => {
     if (!coin) return;
+    setOhlc([]);
     try {
       const d = await getOHLC(coin.id, getTimeframeDays(tf));
       setOhlc(Array.isArray(d) ? d : []);
@@ -124,311 +130,151 @@ export default function Dashboard() {
     return () => { active = false; };
   }, [coin]);
 
-  /* RSI + MACD */
-  useEffect(() => {
-    const el = rsiEl.current;
-    if (!el || ohlc.length < 16) return;
-    try {
-      import("lightweight-charts").then(({ createChart, ColorType, LineSeries }) => {
-        if (!rsiEl.current) return;
-        el.innerHTML = "";
-        const ch = createChart(el, {
-          layout: { background: { type: ColorType.Solid, color: C.bg }, textColor: C.t3, fontSize: 10 },
-          grid: { vertLines: { color: "#1A1A2E" }, horzLines: { color: "#1A1A2E" } },
-          rightPriceScale: { borderColor: C.border },
-          timeScale: { visible: false },
-          width: el.clientWidth, height: 80,
-        });
-        const s = ch.addSeries(LineSeries, { color: C.purple, lineWidth: 1, priceFormat: { type: "price", precision: 1, minMove: 0.1 } });
-        const cl = ohlc.map((d) => d.close);
-        const vals = calculateRSI(cl, 14);
-        const off = cl.length - vals.length;
-        s.setData(vals.map((v, i) => ({ time: ohlc[i + off].time as any, value: v })) as any);
-      });
-    } catch { /* ignore */ }
-  }, [ohlc]);
-
-  useEffect(() => {
-    const el = macdEl.current;
-    if (!el || ohlc.length < 27) return;
-    try {
-      import("lightweight-charts").then(({ createChart, ColorType, LineSeries, HistogramSeries }) => {
-        if (!macdEl.current) return;
-        el.innerHTML = "";
-        const ch = createChart(el, {
-          layout: { background: { type: ColorType.Solid, color: C.bg }, textColor: C.t3, fontSize: 10 },
-          grid: { vertLines: { color: "#1A1A2E" }, horzLines: { color: "#1A1A2E" } },
-          rightPriceScale: { borderColor: C.border },
-          timeScale: { visible: false },
-          width: el.clientWidth, height: 80,
-        });
-        const ml = ch.addSeries(LineSeries, { color: C.blue, lineWidth: 1 });
-        const sl = ch.addSeries(LineSeries, { color: C.gold, lineWidth: 1 });
-        const hl = ch.addSeries(HistogramSeries, { color: C.green + "60" });
-        const cl = ohlc.map((d) => d.close);
-        const r = calculateMACD(cl, 12, 26, 9);
-        const off = cl.length - r.macd.length;
-        ml.setData(r.macd.map((v, i) => ({ time: ohlc[i + off].time as any, value: v })) as any);
-        sl.setData(r.signal.map((v, i) => ({ time: ohlc[i + off].time as any, value: v })) as any);
-        hl.setData(r.histogram.map((v, i) => ({ time: ohlc[i + off].time as any, value: v, color: v >= 0 ? C.green + "60" : C.red + "60" })) as any);
-      });
-    } catch { /* ignore */ }
-  }, [ohlc]);
-
-  /* ----- Calculos de trading ----- */
-  const curP = coin?.current_price || 0;
-  const amtN = parseFloat(amt) || 0;
-  const prcN = ot === "market" ? curP : (parseFloat(prc) || curP);
-  const total = amtN * prcN;
-  const fee = total * FEE;
-  const net = side === "buy" ? total + fee : total - fee;
-  const avail = side === "buy" ? wUSD : wBTC * prcN;
-  const maxA = side === "buy" ? wUSD / prcN : wBTC;
-  const inInsufficient = total > avail;
-
-  /* ----- Ejecutar orden (API real) ----- */
-  const exec = async () => {
-    if (amtN <= 0 || !coin) return;
+  const handleOrder = async (params: { type: OrderType; side: OrderSide; quantity: number; price?: number; stopPrice?: number; total: number }) => {
+    if (!coin) return;
     setSubmitting(true);
     try {
       await placeOrder({
-        type: ot === "stop_limit" ? "stop_loss" : ot,
-        side,
+        type: params.type,
+        side: params.side,
         symbol: coin.symbol,
-        quantity: amtN,
-        price: prcN,
-        stopPrice: ot === "stop_limit" ? (parseFloat(stopP) || 0) : undefined,
+        quantity: params.quantity,
+        price: params.price || coin.current_price,
+        stopPrice: params.stopPrice,
       });
-      toast("success", "Orden ejecutada", `${side === "buy" ? "Compra" : "Venta"} de ${amtN} ${coin.symbol.toUpperCase()} a ${fmt(prcN)}`);
+      toast("success", "Orden ejecutada", `${params.side === "buy" ? "Compra" : "Venta"} de ${params.quantity} ${coin.symbol.toUpperCase()} a ${fmt(params.price || coin.current_price)}`);
       refreshWallet();
-      setAmt(""); setPrc(""); setStopP("");
     } catch (e: any) {
-      toast("error", "Error en la orden", e?.message);
+      toast("error", "Error en la orden", e.message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const filtered = cryptos.filter((c) =>
-    c.name.toLowerCase().includes(q.toLowerCase()) || c.symbol.toLowerCase().includes(q.toLowerCase())
-  );
-  const chg = coin?.price_change_percentage_24h || 0;
+  const dispPrice = livePrice ?? displayCoin.current_price ?? 0;
+  const chg = displayCoin.price_change_percentage_24h || 0;
   const up = chg >= 0;
-  const sym = coin?.symbol.toUpperCase() || "";
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "6px 8px", fontSize: 11, borderRadius: 4,
-    backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1,
-    outline: "none", fontFamily: FONT,
-  };
+  const sym = displayCoin.symbol.toUpperCase();
+  const tickUp = liveOhlc.length > 1
+    ? liveOhlc[liveOhlc.length - 1].close >= liveOhlc[liveOhlc.length - 2].close
+    : up;
 
   return (
     <ErrorBoundary>
-      <div style={{ fontFamily: FONT }}>
-        {marketError && (
-          <div style={{ marginBottom: 14, padding: "9px 14px", borderRadius: 8, backgroundColor: C.gold + "12", border: "1px solid " + C.gold + "44", fontSize: 11, color: C.gold, display: "flex", alignItems: "center", gap: 8 }}>
-            <AlertCircle size={13} />
-            Mercado: {marketError}
-            <button onClick={loadCryptos} style={{ marginLeft: "auto", padding: "3px 10px", fontSize: 10, backgroundColor: C.gold, color: C.bg, border: "none", borderRadius: 4, cursor: "pointer", fontFamily: FONT }}>Reintentar</button>
-          </div>
-        )}
+      <div
+        className="relative text-white overflow-hidden -m-5"
+        style={{
+          backgroundColor: "#08080d",
+          backgroundImage:
+            "radial-gradient(1000px 520px at 85% -10%, rgba(0,212,170,0.10), transparent 55%)," +
+            "radial-gradient(900px 520px at 5% 110%, rgba(10,132,255,0.12), transparent 55%)," +
+            "url('/assets/fondodasboard.png')",
+          backgroundSize: "auto, auto, cover",
+          backgroundPosition: "center, center, center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="absolute inset-0 bg-[#08080d]/30" />
 
-        <div style={{ display: "flex", gap: 14, alignItems: "stretch", height: "calc(100vh - 130px)", minHeight: 540 }}>
-          {/* Lista de activos */}
-          <div style={{ width: 216, border: "1px solid " + C.border, borderRadius: 12, overflow: "hidden", backgroundColor: C.bg2, flexShrink: 0, display: "flex", flexDirection: "column" }}>
-            <div style={{ padding: 8, borderBottom: "1px solid " + C.border }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 5, backgroundColor: C.card, border: "1px solid " + C.border }}>
-                <Search size={13} color={C.t3} />
-                <input placeholder="Buscar..." value={q} onChange={(e) => setQ(e.target.value)} style={{ background: "none", border: "none", outline: "none", color: C.t1, fontSize: 11, width: "100%", fontFamily: FONT }} />
-              </div>
-            </div>
-            <div style={{ flex: 1, overflowY: "auto" }}>
-              {filtered.map((c) => {
-                const act = coin?.id === c.id;
-                const isUp = (c.price_change_percentage_24h || 0) >= 0;
-                return (
-                  <div key={c.id} onClick={() => setCoin(c)} style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 10px", cursor: "pointer", backgroundColor: act ? C.card : "transparent", borderLeft: act ? "2px solid " + C.gold : "2px solid transparent" }}>
-                    {c.image ? (
-                      <img src={c.image} alt="" style={{ width: 18, height: 18, borderRadius: "50%" }} />
-                    ) : (
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", backgroundColor: C.gold + "33", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800, color: C.gold }}>{c.symbol.slice(0, 2)}</div>
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 11, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.symbol.toUpperCase()}</div>
-                      <div style={{ fontSize: 9, color: C.t3 }}>${c.current_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-                    </div>
-                    <div style={{ fontSize: 9, color: isUp ? C.green : C.red, fontWeight: 600 }}>{isUp ? "+" : ""}{c.price_change_percentage_24h?.toFixed(2)}%</div>
-                  </div>
-                );
-              })}
-              {cryptos.length === 0 && !loading && (
-                <div style={{ padding: 16, textAlign: "center", color: C.t3, fontSize: 11 }}>
-                  Sin datos de mercado.<br />
-                  <button onClick={loadCryptos} style={{ marginTop: 8, padding: "4px 12px", fontSize: 10, backgroundColor: C.card, color: C.gold, border: "1px solid " + C.border, borderRadius: 4, cursor: "pointer", fontFamily: FONT }}>Reintentar</button>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="relative z-10 flex flex-col xl:flex-row xl:h-[calc(100vh-54px)]">
+          {/* ===== Watchlist ===== */}
+          <aside className="shrink-0 xl:w-[236px] flex flex-col xl:h-full">
+            <AssetSelector coins={visibleCoins} selectedId={displayCoin.id} onSelect={setCoin} loading={loading} />
+          </aside>
 
-          {/* Gráfico */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", border: "1px solid " + C.border, borderRadius: 12, overflow: "hidden", backgroundColor: C.bg2, minWidth: 0 }}>
-            {coin && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid " + C.border, flexWrap: "wrap", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14 }}>{sym} / USD</div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                    <span style={{ fontWeight: 700, fontSize: 20 }}>{fmt(curP, curP < 1 ? 4 : 2)}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: up ? C.green : C.red, display: "flex", alignItems: "center", gap: 2 }}>
-                      {up ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
-                      {up ? "+" : ""}{chg.toFixed(2)}%
-                    </span>
-                  </div>
+          {/* ===== Gráfico ===== */}
+          <main className="flex-1 min-w-0 flex flex-col xl:h-full">
+            <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-1 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[14px] font-extrabold" style={{ backgroundColor: (displayCoin.color || "#0a84ff") + "26", color: displayCoin.color || "#0a84ff" }}>
+                  {sym.slice(0, 2)}
                 </div>
-                <div style={{ display: "flex", gap: 2 }}>
-                  {TFS.map((t) => (
-                    <button key={t} onClick={() => setTf(t)} style={{ padding: "3px 7px", fontSize: 10, fontWeight: tf === t ? 700 : 400, border: "none", cursor: "pointer", borderRadius: 3, backgroundColor: tf === t ? C.gold : "transparent", color: tf === t ? C.bg : C.t2, fontFamily: FONT }}>{t}</button>
-                  ))}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[20px] font-extrabold tracking-tight">{fmt(dispPrice, dispPrice < 1 ? 4 : 2)}</span>
+                  <span className="text-[14px] font-bold flex items-center gap-1" style={{ color: up ? "#00d4aa" : "#ff4d5e" }}>
+                    {up ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
+                    {up ? "+" : ""}{chg.toFixed(2)}%
+                  </span>
                 </div>
               </div>
-            )}
-
-            {coin && (
-              <div style={{ display: "flex", gap: 16, padding: "6px 14px", borderBottom: "1px solid " + C.border, backgroundColor: C.bg, fontSize: 10, flexWrap: "wrap" }}>
-                <span><span style={{ color: C.t3 }}>24H High </span><strong style={{ color: C.t1 }}>{fmt(coin.high_24h || 0, 2)}</strong></span>
-                <span><span style={{ color: C.t3 }}>24H Low </span><strong style={{ color: C.t1 }}>{fmt(coin.low_24h || 0, 2)}</strong></span>
-                <span><span style={{ color: C.t3 }}>Vol </span><strong style={{ color: C.t1 }}>{fmtCompact(coin.total_volume || 0)}</strong></span>
-                <span><span style={{ color: C.t3 }}>MCap </span><strong style={{ color: C.t1 }}>{fmtCompact(coin.market_cap || 0)}</strong></span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: "auto" }}>
-                  <Sparkles size={11} color={C.purple} /> Score IA: <strong style={{ color: aiScore >= 65 ? C.green : aiScore >= 45 ? C.gold : C.red }}>{aiScore}/100</strong>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-400">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  EN VIVO
                 </span>
+                {!connected && (
+                  <span className="text-[11px] text-gray-600">· datos de demostración</span>
+                )}
+                {TFS.map((t) => (
+                  <button key={t} onClick={() => setTf(t)} className={`px-2 py-1 rounded-lg text-[12px] font-semibold transition-colors ${tf === t ? "bg-[#00d4aa]/15 text-[#00d4aa]" : "text-gray-500 hover:text-gray-200"}`}>{t}</button>
+                ))}
               </div>
-            )}
-
-            <div style={{ flex: 1, backgroundColor: C.bg, minHeight: 300, position: "relative" }}>
-              <PriceChart data={ohlc} height="fill" showVolume />
-              {loading && (
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: C.bg + "CC", zIndex: 5 }}>
-                  <RefreshCw size={20} color={C.gold} />
-                  <span style={{ marginLeft: 8, color: C.t2, fontSize: 11 }}>Cargando mercado...</span>
-                </div>
-              )}
             </div>
 
-            {/* Indicadores */}
-            <div style={{ height: 80, borderTop: "1px solid " + C.border, position: "relative", backgroundColor: C.bg }}>
-              <span style={{ position: "absolute", top: 3, left: 7, fontSize: 8, color: C.purple, fontWeight: 600, zIndex: 2 }}>RSI (14)</span>
-              <div ref={rsiEl} style={{ width: "100%", height: "100%" }} />
+            {/* Stats de mercado */}
+            <div className="flex gap-4 px-4 py-2 text-[12px] text-gray-500 flex-wrap">
+              <span>24H Alto <strong className="text-gray-200">{fmt(displayCoin.high_24h || 0, 2)}</strong></span>
+              <span>24H Bajo <strong className="text-gray-200">{fmt(displayCoin.low_24h || 0, 2)}</strong></span>
+              <span>Volumen <strong className="text-gray-200">{fmtCompact(displayCoin.total_volume || 0)}</strong></span>
+              <span>Cap. mercado <strong className="text-gray-200">{fmtCompact(displayCoin.market_cap || 0)}</strong></span>
+              <span className="ml-auto flex items-center gap-1.5">
+                <Sparkles size={11} color="#a78bfa" /> Score IA: <strong style={{ color: aiScore >= 65 ? "#00d4aa" : aiScore >= 45 ? "#f5a623" : "#ff4d5e" }}>{aiScore}/100</strong>
+              </span>
             </div>
-            <div style={{ height: 80, borderTop: "1px solid " + C.border, position: "relative", backgroundColor: C.bg }}>
-              <span style={{ position: "absolute", top: 3, left: 7, fontSize: 8, color: C.gold, fontWeight: 600, zIndex: 2 }}>MACD (12,26,9)</span>
-              <div ref={macdEl} style={{ width: "100%", height: "100%" }} />
-            </div>
-          </div>
 
-          {/* Panel de trading */}
-          <div style={{ width: 286, border: "1px solid " + C.border, borderRadius: 12, overflowY: "auto", backgroundColor: C.bg2, flexShrink: 0, display: "flex", flexDirection: "column" }}>
+            {/* Chart en vivo */}
+            <div className="flex-1 min-h-[320px] px-2 pb-2">
+              <PriceChart data={liveOhlc} height="fill" showVolume live defaultIndicators={["sma"]} />
+            </div>
+          </main>
+
+          {/* ===== Panel de trading ===== */}
+          <aside className="shrink-0 xl:w-[320px] flex flex-col xl:h-full xl:overflow-y-auto">
             {/* Billetera */}
-            <div style={{ padding: "10px 12px", borderBottom: "1px solid " + C.border }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-                <WalletIcon size={13} color={C.gold} />
-                <span style={{ fontSize: 11, fontWeight: 600 }}>Billetera</span>
-                <div style={{ flex: 1 }} />
-                <button onClick={() => nav("/wallet")} style={{ fontSize: 9, color: C.blue, background: "none", border: "none", cursor: "pointer", fontFamily: FONT }}>Ver todo →</button>
+            <div className="px-4 pt-4">
+              <div className="flex items-center gap-1.5 mb-2">
+                <WalletIcon size={13} className="text-[#f5a623]" />
+                <span className="text-[13px] font-bold">Billetera</span>
+                <div className="flex-1" />
+                <button onClick={() => nav("/wallet")} className="text-[11px] text-[#0a84ff]">Ver todo →</button>
               </div>
-              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { label: "USD", value: fmt(wUSD, 2), color: C.green },
-                  { label: "BTC", value: wBTC.toFixed(6), color: C.gold },
-                  { label: "ETH", value: wETH.toFixed(6), color: C.purple },
-                  { label: "USDC", value: wUSDC.toFixed(2), color: C.blue },
+                  { label: "USD", value: fmt(wUSD, 2), color: "#00d4aa" },
+                  { label: "BTC", value: wBTC.toFixed(6), color: "#f5a623" },
+                  { label: "ETH", value: wETH.toFixed(6), color: "#a78bfa" },
+                  { label: "USDC", value: wUSDC.toFixed(2), color: "#0a84ff" },
                 ].map((b) => (
-                  <div key={b.label} style={{ flex: "1 1 45%", padding: "5px 7px", borderRadius: 5, backgroundColor: C.card }}>
-                    <div style={{ fontSize: 8, color: C.t3 }}>{b.label}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: b.color }}>{b.value}</div>
+                  <div key={b.label} className="px-1 py-1.5">
+                    <div className="text-[10px] text-gray-600">{b.label}</div>
+                    <div className="text-[14px] font-bold" style={{ color: b.color }}>{b.value}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {coin && (
-              <div style={{ padding: "8px 12px", borderBottom: "1px solid " + C.border }}>
-                <ScoreDisplay score={aiScore} confidence={0.7 + aiScore / 1000} size="sm" />
+            <div className="px-4 pt-3 pb-1">
+              <ScoreDisplay score={aiScore} confidence={0.7 + aiScore / 1000} size="sm" />
+            </div>
+
+            {coin ? (
+              <OrderForm
+                coin={coin}
+                buyAvailable={wUSD}
+                sellAvailable={wBTC}
+                aiScore={aiScore}
+                onSubmit={handleOrder}
+                submitting={submitting}
+              />
+            ) : (
+              <div className="px-4 py-10 text-center text-gray-500 text-[13px]">
+                <div className="animate-pulse">Conectando con el mercado…</div>
               </div>
             )}
-
-            {/* Buy/Sell */}
-            <div style={{ display: "flex", borderBottom: "1px solid " + C.border }}>
-              <button onClick={() => setSide("buy")} style={{ flex: 1, padding: "8px 0", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", fontFamily: FONT, backgroundColor: side === "buy" ? C.greenBg : "transparent", color: side === "buy" ? C.green : C.t3, borderBottom: side === "buy" ? "2px solid " + C.green : "2px solid transparent" }}>COMPRAR</button>
-              <button onClick={() => setSide("sell")} style={{ flex: 1, padding: "8px 0", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", fontFamily: FONT, backgroundColor: side === "sell" ? C.redBg : "transparent", color: side === "sell" ? C.red : C.t3, borderBottom: side === "sell" ? "2px solid " + C.red : "2px solid transparent" }}>VENDER</button>
-            </div>
-
-            {/* Tipo de orden */}
-            <div style={{ display: "flex", gap: 2, padding: "8px 12px" }}>
-              {(["market", "limit", "stop_limit"] as OT[]).map((t) => (
-                <button key={t} onClick={() => setOt(t)} style={{ flex: 1, padding: "4px 0", fontSize: 9, fontWeight: ot === t ? 700 : 400, border: "1px solid " + (ot === t ? C.border : "transparent"), cursor: "pointer", borderRadius: 4, fontFamily: FONT, backgroundColor: ot === t ? C.card : "transparent", color: ot === t ? C.t1 : C.t3 }}>
-                  {t === "stop_limit" ? "Stop-Límite" : t.charAt(0).toUpperCase() + t.slice(1)}
-                </button>
-              ))}
-            </div>
-
-            {/* Formulario */}
-            <div style={{ padding: "4px 12px 12px", flex: 1, display: "flex", flexDirection: "column", gap: 7 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10 }}>
-                <span style={{ color: C.t3 }}>Disponible</span>
-                <span style={{ color: C.t2, fontWeight: 600 }}>{side === "buy" ? fmt(avail, 2) : wBTC.toFixed(6) + " " + sym}</span>
-              </div>
-
-              {ot !== "market" && (
-                <div>
-                  <label style={{ fontSize: 9, color: C.t3, display: "block", marginBottom: 2 }}>Precio (USD)</label>
-                  <input value={prc} onChange={(e) => setPrc(e.target.value)} placeholder={String(curP)} style={inputStyle} />
-                </div>
-              )}
-              {ot === "stop_limit" && (
-                <div>
-                  <label style={{ fontSize: 9, color: C.t3, display: "block", marginBottom: 2 }}>Precio stop</label>
-                  <input value={stopP} onChange={(e) => setStopP(e.target.value)} placeholder="0.00" style={inputStyle} />
-                </div>
-              )}
-              <div>
-                <label style={{ fontSize: 9, color: C.t3, display: "block", marginBottom: 2 }}>Cantidad ({sym})</label>
-                <input value={amt} onChange={(e) => setAmt(e.target.value)} placeholder="0.00" style={inputStyle} />
-              </div>
-
-              <div style={{ display: "flex", gap: 3 }}>
-                {[25, 50, 75, 100].map((p) => (
-                  <button key={p} onClick={() => setAmt((maxA * p / 100).toFixed(6))} style={{ flex: 1, padding: "3px 0", fontSize: 9, border: "1px solid " + C.border, backgroundColor: C.card, color: C.t2, borderRadius: 4, cursor: "pointer", fontFamily: FONT }}>{p}%</button>
-                ))}
-              </div>
-
-              {inInsufficient && amtN > 0 && (
-                <div style={{ padding: "5px 8px", borderRadius: 4, backgroundColor: C.redBg, border: "1px solid " + C.red + "40", color: C.red, fontSize: 9 }}>
-                  Saldo insuficiente. Disponible: {fmt(avail)}
-                </div>
-              )}
-
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, padding: "3px 0", borderTop: "1px solid " + C.border }}>
-                <span style={{ color: C.t3 }}>Comisión (0.1%)</span>
-                <span style={{ color: C.t2 }}>{fmt(fee)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, padding: "6px 8px", borderRadius: 5, backgroundColor: C.card }}>
-                <span style={{ color: C.t2 }}>Total</span>
-                <span style={{ color: side === "buy" ? C.green : C.red }}>{fmt(net)}</span>
-              </div>
-
-              <button
-                onClick={exec}
-                disabled={submitting || amtN <= 0 || inInsufficient}
-                style={{ width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", borderRadius: 6, fontFamily: FONT, backgroundColor: side === "buy" ? C.green : C.red, color: side === "buy" ? C.bg : "#fff", opacity: submitting || amtN <= 0 || inInsufficient ? 0.6 : 1 }}
-              >
-                {submitting ? "Enviando..." : (side === "buy" ? "COMPRAR" : "VENDER") + " " + sym}
-              </button>
-
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 9, color: C.t3, marginTop: 4 }}>
-                <TrendingUp size={10} color={C.green} /> Mercado en vivo · <TrendingDown size={10} color={C.red} /> precios reales
-              </div>
-            </div>
-          </div>
+          </aside>
         </div>
       </div>
     </ErrorBoundary>

@@ -77,12 +77,12 @@ export default function Header({ onToggleSidebar }: Props) {
         <button onClick={onToggleSidebar} style={{ background: "none", border: "none", cursor: "pointer", color: C.t2, display: "flex", padding: 4 }} aria-label="Menú">
           <Menu size={18} />
         </button>
-        <h2 style={{ fontSize: 14, fontWeight: 700, color: C.t1, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: C.t1, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h2>
         {/* Estado de conexión real */}
         {apiOnline !== null && (
           <span
             style={{
-              display: "inline-flex", alignItems: "center", gap: 5, fontSize: 9, fontWeight: 700,
+              display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700,
               padding: "2px 9px", borderRadius: 999, whiteSpace: "nowrap",
               backgroundColor: apiOnline ? C.green + "14" : C.red + "14",
               color: apiOnline ? C.green : C.red,
@@ -97,7 +97,7 @@ export default function Header({ onToggleSidebar }: Props) {
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         {/* Balance real */}
-        <div style={{ display: "none", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 7, backgroundColor: C.card, border: "1px solid " + C.border, fontSize: 11, "@media (min-width: 900px)": { display: "flex" } } as any}>
+        <div style={{ display: "none", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 7, backgroundColor: C.card, border: "1px solid " + C.border, fontSize: 13, "@media (min-width: 900px)": { display: "flex" } } as any}>
           <span style={{ color: C.t3 }}>Portafolio</span>
           <span style={{ fontWeight: 700, color: C.t1 }}>{fmt(totalUsd)}</span>
         </div>
@@ -114,10 +114,10 @@ export default function Header({ onToggleSidebar }: Props) {
               cursor: "pointer", fontFamily: FONT,
             }}
           >
-            <div style={{ width: 26, height: 26, borderRadius: "50%", backgroundColor: user?.role === "admin" ? C.gold : C.green, color: "#0A0A0F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800 }}>
+            <div style={{ width: 26, height: 26, borderRadius: "50%", backgroundColor: user?.role === "admin" ? C.gold : C.green, color: "#0A0A0F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800 }}>
               {((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")).toUpperCase()}
             </div>
-            <span style={{ fontSize: 11, fontWeight: 600, color: C.t1, display: "none" }}>{user?.firstName}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: C.t1, display: "none" }}>{user?.firstName}</span>
             <ChevronDown size={12} color={C.t3} />
           </button>
 
@@ -132,13 +132,13 @@ export default function Header({ onToggleSidebar }: Props) {
                 }}
               >
                 <div style={{ padding: "8px 10px", borderBottom: "1px solid " + C.border, marginBottom: 4 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{user?.firstName} {user?.lastName}</div>
-                  <div style={{ fontSize: 9, color: C.t3 }}>{user?.email}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{user?.firstName} {user?.lastName}</div>
+                  <div style={{ fontSize: 11, color: C.t3 }}>{user?.email}</div>
                   <div style={{ display: "flex", gap: 5, marginTop: 6 }}>
-                    <span style={{ fontSize: 8, fontWeight: 700, color: C.green, backgroundColor: C.green + "14", padding: "2px 7px", borderRadius: 999, textTransform: "uppercase" }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: C.green, backgroundColor: C.green + "14", padding: "2px 7px", borderRadius: 999, textTransform: "uppercase" }}>
                       {user?.role}
                     </span>
-                    <span style={{ fontSize: 8, fontWeight: 700, color: C.blue, backgroundColor: C.blue + "14", padding: "2px 7px", borderRadius: 999 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: C.blue, backgroundColor: C.blue + "14", padding: "2px 7px", borderRadius: 999 }}>
                       KYC {user?.kycStatus}
                     </span>
                   </div>
@@ -163,6 +163,6 @@ export default function Header({ onToggleSidebar }: Props) {
 
 const menuItem: React.CSSProperties = {
   display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "8px 10px",
-  background: "none", border: "none", cursor: "pointer", color: C.t1, fontSize: 12,
+  background: "none", border: "none", cursor: "pointer", color: C.t1, fontSize: 14,
   borderRadius: 6, textAlign: "left", fontFamily: FONT,
 };

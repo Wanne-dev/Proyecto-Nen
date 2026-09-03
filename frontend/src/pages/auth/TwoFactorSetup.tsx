@@ -62,45 +62,45 @@ export default function TwoFactorSetup() {
             <Shield size={24} color={C.green} />
           </div>
           <h1 style={{ fontSize: 20, fontWeight: 800, color: C.t1, margin: 0 }}>Configura 2FA</h1>
-          <p style={{ fontSize: 11, color: C.t3, marginTop: 6 }}>Protege tu cuenta con códigos TOTP que cambian cada 30 segundos</p>
+          <p style={{ fontSize: 13, color: C.t3, marginTop: 6 }}>Protege tu cuenta con códigos TOTP que cambian cada 30 segundos</p>
         </div>
 
         <div style={{ backgroundColor: C.bg2, border: "1px solid " + C.border, borderRadius: 14, padding: 22 }}>
           {loading ? (
-            <div style={{ textAlign: "center", padding: 30, color: C.t3, fontSize: 12 }}>Generando secreto seguro...</div>
+            <div style={{ textAlign: "center", padding: 30, color: C.t3, fontSize: 14 }}>Generando secreto seguro...</div>
           ) : step === 1 ? (
             <>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.t1, marginBottom: 12 }}>Paso 1 — Escanea el código QR</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, marginBottom: 12 }}>Paso 1 — Escanea el código QR</div>
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
                 <div style={{ padding: 14, backgroundColor: "#fff", borderRadius: 12 }}>
                   <QRCodeSVG value={otpauthUrl || `otpauth://totp/BANCA%20NEN:${encodeURIComponent(user?.email || "usuario@nen.com")}?secret=${secret}&issuer=BANCA%20NEN`} size={180} level="M" />
                 </div>
               </div>
-              <div style={{ fontSize: 10, color: C.t3, textAlign: "center", lineHeight: 1.6, marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: C.t3, textAlign: "center", lineHeight: 1.6, marginBottom: 12 }}>
                 Usa <strong style={{ color: C.t1 }}>Google Authenticator</strong>, <strong style={{ color: C.t1 }}>Authy</strong> o
                 cualquier app compatible TOTP. Si no puedes escanear, usa la clave manual:
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: C.card, border: "1px solid " + C.border, borderRadius: 8, padding: "8px 10px" }}>
                 <KeyRound size={13} color={C.gold} />
-                <code style={{ flex: 1, fontSize: 11, color: C.t1, letterSpacing: 1, wordBreak: "break-all" }}>{secret}</code>
+                <code style={{ flex: 1, fontSize: 13, color: C.t1, letterSpacing: 1, wordBreak: "break-all" }}>{secret}</code>
                 <button onClick={copySecret} style={{ background: "none", border: "none", cursor: "pointer", color: C.t2, display: "flex" }} title="Copiar">
                   {copied ? <CheckCircle2 size={14} color={C.green} /> : <Copy size={14} />}
                 </button>
               </div>
 
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.t1, margin: "18px 0 8px" }}>Paso 2 — Verifica el código</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, margin: "18px 0 8px" }}>Paso 2 — Verifica el código</div>
               <input
                 type="text" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                 placeholder="000000"
                 style={{ width: "100%", padding: "13px 0", fontSize: 24, letterSpacing: 14, textAlign: "center", borderRadius: 8, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: "monospace", fontWeight: 700 }}
               />
-              <div style={{ fontSize: 9, color: C.t3, textAlign: "center", marginTop: 6 }}>Genera el código en tu app autenticadora</div>
+              <div style={{ fontSize: 11, color: C.t3, textAlign: "center", marginTop: 6 }}>Genera el código en tu app autenticadora</div>
 
               <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-                <button onClick={() => nav(-1)} style={{ padding: "10px 16px", fontSize: 12, borderRadius: 8, backgroundColor: C.card, color: C.t2, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT, display: "flex", alignItems: "center", gap: 6 }}>
+                <button onClick={() => nav(-1)} style={{ padding: "10px 16px", fontSize: 14, borderRadius: 8, backgroundColor: C.card, color: C.t2, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT, display: "flex", alignItems: "center", gap: 6 }}>
                   <ArrowLeft size={13} /> Atrás
                 </button>
-                <button onClick={verify} style={{ flex: 1, padding: "10px 0", fontSize: 13, fontWeight: 700, borderRadius: 8, backgroundColor: C.green, color: C.bg, border: "none", cursor: "pointer", fontFamily: FONT }}>
+                <button onClick={verify} style={{ flex: 1, padding: "10px 0", fontSize: 15, fontWeight: 700, borderRadius: 8, backgroundColor: C.green, color: C.bg, border: "none", cursor: "pointer", fontFamily: FONT }}>
                   Ya lo escaneé / Verificar
                 </button>
               </div>
@@ -109,15 +109,15 @@ export default function TwoFactorSetup() {
             <div style={{ textAlign: "center", padding: "10px 0" }}>
               <CheckCircle2 size={52} color={C.green} />
               <div style={{ fontSize: 16, fontWeight: 800, color: C.t1, marginTop: 12 }}>¡2FA configurado!</div>
-              <div style={{ fontSize: 11, color: C.t3, marginTop: 6, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: C.t3, marginTop: 6, lineHeight: 1.6 }}>
                 A partir de ahora necesitarás un código de tu app autenticadora para iniciar sesión.
                 <br />Guarda tu clave de respaldo en un lugar seguro.
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 18 }}>
-                <button onClick={enable} style={{ padding: "12px 0", fontSize: 13, fontWeight: 700, borderRadius: 8, backgroundColor: C.green, color: C.bg, border: "none", cursor: "pointer", fontFamily: FONT }}>
+                <button onClick={enable} style={{ padding: "12px 0", fontSize: 15, fontWeight: 700, borderRadius: 8, backgroundColor: C.green, color: C.bg, border: "none", cursor: "pointer", fontFamily: FONT }}>
                   Activar 2FA y continuar
                 </button>
-                <button onClick={() => nav("/settings/security")} style={{ padding: "10px 0", fontSize: 12, borderRadius: 8, backgroundColor: "transparent", color: C.t2, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT }}>
+                <button onClick={() => nav("/settings/security")} style={{ padding: "10px 0", fontSize: 14, borderRadius: 8, backgroundColor: "transparent", color: C.t2, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT }}>
                   Hacerlo más tarde
                 </button>
               </div>

@@ -78,7 +78,7 @@ export default function Admin() {
               action={
                 <div style={{ display: "flex", gap: 4 }}>
                   {(["7d", "30d", "90d"] as const).map((r) => (
-                    <button key={r} onClick={() => setRange(r)} style={{ padding: "3px 10px", fontSize: 9, borderRadius: 4, backgroundColor: range === r ? C.gold : C.card, color: range === r ? C.bg : C.t2, border: "1px solid " + (range === r ? C.gold : C.border), cursor: "pointer", fontFamily: FONT, fontWeight: 600 }}>
+                    <button key={r} onClick={() => setRange(r)} style={{ padding: "3px 10px", fontSize: 11, borderRadius: 4, backgroundColor: range === r ? C.gold : C.card, color: range === r ? C.bg : C.t2, border: "1px solid " + (range === r ? C.gold : C.border), cursor: "pointer", fontFamily: FONT, fontWeight: 600 }}>
                       {r.toUpperCase()}
                     </button>
                   ))}
@@ -95,8 +95,8 @@ export default function Admin() {
                   { label: "Cuentas bloqueadas", value: stats.blockedAccounts, color: C.red },
                 ].map((x) => (
                   <div key={x.label} style={{ padding: "9px 11px", borderRadius: 8, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                    <div style={{ fontSize: 9, color: C.t3 }}>{x.label}</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: x.color }}>{x.value.toLocaleString()}</div>
+                    <div style={{ fontSize: 11, color: C.t3 }}>{x.label}</div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: x.color }}>{x.value.toLocaleString()}</div>
                   </div>
                 ))}
               </div>
@@ -109,10 +109,10 @@ export default function Admin() {
                   <div key={h.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 9px", borderRadius: 7, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: h.ok ? C.green : C.red, flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: C.t1 }}>{h.label}</div>
-                      <div style={{ fontSize: 8, color: C.t3 }}>{h.status}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: C.t1 }}>{h.label}</div>
+                      <div style={{ fontSize: 10, color: C.t3 }}>{h.status}</div>
                     </div>
-                    <span style={{ fontSize: 9, color: C.t3 }}>{h.value}</span>
+                    <span style={{ fontSize: 11, color: C.t3 }}>{h.value}</span>
                   </div>
                 ))}
               </div>
@@ -131,10 +131,10 @@ export default function Admin() {
                       <Icon size={13} color={m.color} />
                     </span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 11, color: C.t1 }}>{a.text}</div>
-                      <div style={{ fontSize: 9, color: C.t3, marginTop: 1 }}>{a.type}</div>
+                      <div style={{ fontSize: 13, color: C.t1 }}>{a.text}</div>
+                      <div style={{ fontSize: 11, color: C.t3, marginTop: 1 }}>{a.type}</div>
                     </div>
-                    <span style={{ fontSize: 9, color: C.t3, whiteSpace: "nowrap" }}>{timeAgo(a.time)}</span>
+                    <span style={{ fontSize: 11, color: C.t3, whiteSpace: "nowrap" }}>{timeAgo(a.time)}</span>
                   </div>
                 );
               })}

@@ -14,12 +14,22 @@
     "dev": "pnpm --parallel --filter banca-nen-backend --filter banca-nen-frontend dev",
     "build:back": "pnpm --filter banca-nen-backend build",
     "build:front": "pnpm --filter banca-nen-frontend build",
-    "build": "pnpm --filter banca-nen-frontend build",
-    "start:back": "pnpm --filter banca-nen-backend start",
+    "build": "pnpm run build:back && pnpm run build:front",
+    "typecheck": "pnpm --filter banca-nen-backend typecheck && pnpm --filter banca-nen-frontend typecheck",
+    "test:back": "pnpm --filter banca-nen-backend test",
+    "test:front": "pnpm --filter banca-nen-frontend test",
+    "test": "pnpm run test:back && pnpm run test:front",
     "lint": "pnpm --filter banca-nen-frontend lint",
-    "test": "pnpm --filter banca-nen-frontend test",
+    "lint:fix": "pnpm --filter banca-nen-frontend lint:fix",
+    "start:back": "pnpm --filter banca-nen-backend start",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules"
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
+    "husky": "9.1.7"
   }
 }

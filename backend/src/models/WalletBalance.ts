@@ -40,7 +40,7 @@ export class WalletBalance {
   usdRate: number;
 
   @Column({ name: "usd_rate_updated_at", type: "timestamptz", nullable: true })
-  usdRateUpdatedAt: Date;
+  usdRateUpdatedAt: Date | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

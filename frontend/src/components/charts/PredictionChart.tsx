@@ -13,7 +13,7 @@ export default function PredictionChart({ data, height = 220 }: Props) {
       <BarChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: 0 }} barGap={3}>
         <XAxis
           dataKey="name"
-          tick={{ fill: C.t3, fontSize: 9, fontFamily: FONT }}
+          tick={{ fill: C.t3, fontSize: 11, fontFamily: FONT }}
           axisLine={{ stroke: C.border }}
           tickLine={false}
           interval={0}
@@ -22,7 +22,7 @@ export default function PredictionChart({ data, height = 220 }: Props) {
           height={54}
         />
         <YAxis
-          tick={{ fill: C.t3, fontSize: 9, fontFamily: FONT }}
+          tick={{ fill: C.t3, fontSize: 11, fontFamily: FONT }}
           axisLine={false}
           tickLine={false}
           width={56}
@@ -31,9 +31,9 @@ export default function PredictionChart({ data, height = 220 }: Props) {
         <Tooltip
           contentStyle={{
             backgroundColor: C.bg2, border: "1px solid " + C.border, borderRadius: 8,
-            fontFamily: FONT, fontSize: 11, color: C.t1,
+            fontFamily: FONT, fontSize: 13, color: C.t1,
           }}
-          labelStyle={{ color: C.t3, fontSize: 10 }}
+          labelStyle={{ color: C.t3, fontSize: 12 }}
           formatter={(value: any, name: any) => [
             "$" + Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }),
             name === "actual" ? "Precio actual" : "Pronóstico IA",

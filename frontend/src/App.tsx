@@ -52,6 +52,13 @@ function VerifiedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/* Ruta exclusiva del administrador: un usuario normal NO saca reportes. */
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore((s) => s.user);
+  if (user?.role !== "admin") return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -76,7 +83,7 @@ export default function App() {
           <Route path="/trading" element={<Trading />} />
           <Route path="/trading/prediction" element={<Prediction />} />
           <Route path="/trading/history" element={<OrderHistory />} />
-          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/security" element={<Security />} />
 

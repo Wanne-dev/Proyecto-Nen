@@ -20,7 +20,7 @@ export default function PageHeader({ title, subtitle, actions, icon }: Props) {
         )}
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: C.t1, letterSpacing: -0.4, margin: 0 }}>{title}</h1>
-          {subtitle && <p style={{ fontSize: 11, color: C.t3, margin: "3px 0 0", maxWidth: 560 }}>{subtitle}</p>}
+          {subtitle && <p style={{ fontSize: 13, color: C.t3, margin: "3px 0 0", maxWidth: 560 }}>{subtitle}</p>}
         </div>
       </div>
       {actions && <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>{actions}</div>}

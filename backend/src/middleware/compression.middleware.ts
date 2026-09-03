@@ -1,2 +1,4 @@
-// Archivo: backend/src/middleware/compression.middleware.ts
-// Propósito: Compresión de respuestas
+/* CompresiÃ³n de respuestas â€” BANCA NEN */
+import compression from "compression";
+
+export const compressionMiddleware = compression();

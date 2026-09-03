@@ -51,7 +51,7 @@ export class Transaction {
   @Column({ type: "decimal", precision: 18, scale: 8 })
   amount: number;
 
-  @Column({ length: 3 })
+  @Column({ type: "varchar", length: 3 })
   currency: string;
 
   @Column({ name: "amount_usd", type: "decimal", precision: 18, scale: 2 })
@@ -60,35 +60,35 @@ export class Transaction {
   @Column({ type: "decimal", precision: 18, scale: 8, default: 0 })
   fee: number;
 
-  @Column({ name: "fee_currency", length: 3, default: "USD" })
+  @Column({ type: "varchar", name: "fee_currency", length: 3, default: "USD" })
   feeCurrency: string;
 
-  @Column({ length: 500, nullable: true })
-  description: string;
+  @Column({ type: "varchar", length: 500, nullable: true })
+  description: string | null;
 
-  @Column({ name: "reference_id", unique: true, length: 100 })
+  @Column({ type: "varchar", name: "reference_id", unique: true, length: 100 })
   referenceId: string;
 
-  @Column({ name: "ref_hash", length: 64, nullable: true })
-  refHash: string;
+  @Column({ type: "varchar", name: "ref_hash", length: 64, nullable: true })
+  refHash: string | null;
 
   @Column({ name: "recipient_user_id", type: "uuid", nullable: true })
-  recipientUserId: string;
+  recipientUserId: string | null;
 
   @Column({ name: "recipient_wallet_id", type: "uuid", nullable: true })
-  recipientWalletId: string;
+  recipientWalletId: string | null;
 
-  @Column({ name: "ip_address", nullable: true, length: 45 })
-  ipAddress: string;
+  @Column({ type: "varchar", name: "ip_address", nullable: true, length: 45 })
+  ipAddress: string | null;
 
   @Column({ name: "ia_score", nullable: true, type: "decimal", precision: 5, scale: 2 })
-  iaScore: number;
+  iaScore: number | null;
 
-  @Column({ name: "ia_risk_level", nullable: true, length: 20 })
-  iaRiskLevel: string;
+  @Column({ type: "varchar", name: "ia_risk_level", nullable: true, length: 20 })
+  iaRiskLevel: string | null;
 
   @Column({ name: "metadata", type: "jsonb", nullable: true })
-  metadata: object;
+  metadata: object | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

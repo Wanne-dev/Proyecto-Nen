@@ -37,8 +37,8 @@ export default function Card({ children, title, subtitle, action, padded = true,
           }}
         >
           <div>
-            {title && <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{title}</div>}
-            {subtitle && <div style={{ fontSize: 10, color: C.t3, marginTop: 2 }}>{subtitle}</div>}
+            {title && <div style={{ fontSize: 15, fontWeight: 700, color: C.t1 }}>{title}</div>}
+            {subtitle && <div style={{ fontSize: 12, color: C.t3, marginTop: 2 }}>{subtitle}</div>}
           </div>
           {action}
         </div>

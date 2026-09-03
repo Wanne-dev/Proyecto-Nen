@@ -31,7 +31,7 @@ export default function NotificationBell() {
           <span
             style={{
               position: "absolute", top: -2, right: -2, minWidth: 15, height: 15, borderRadius: 999,
-              backgroundColor: C.red, color: "#fff", fontSize: 9, fontWeight: 700,
+              backgroundColor: C.red, color: "#fff", fontSize: 11, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px",
             }}
           >
@@ -51,11 +51,11 @@ export default function NotificationBell() {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid " + C.border }}>
-              <span style={{ fontSize: 12, fontWeight: 700 }}>Notificaciones</span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>Notificaciones</span>
               {unread > 0 && (
                 <button
                   onClick={markAllRead}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: C.gold, fontSize: 10, display: "flex", alignItems: "center", gap: 4, fontFamily: FONT }}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: C.gold, fontSize: 12, display: "flex", alignItems: "center", gap: 4, fontFamily: FONT }}
                 >
                   <CheckCheck size={12} /> Marcar todas
                 </button>
@@ -63,7 +63,7 @@ export default function NotificationBell() {
             </div>
             <div style={{ maxHeight: 380, overflowY: "auto" }}>
               {notifications.length === 0 && (
-                <div style={{ padding: 24, textAlign: "center", color: C.t3, fontSize: 11 }}>Sin notificaciones</div>
+                <div style={{ padding: 24, textAlign: "center", color: C.t3, fontSize: 13 }}>Sin notificaciones</div>
               )}
               {notifications.map((n) => {
                 const meta = TYPE_META[n.type] || TYPE_META.system;
@@ -82,12 +82,12 @@ export default function NotificationBell() {
                       <Icon size={13} color={meta.color} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: C.t1, display: "flex", justifyContent: "space-between", gap: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, display: "flex", justifyContent: "space-between", gap: 8 }}>
                         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.title}</span>
                         {!n.read && <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: C.gold, flexShrink: 0, marginTop: 4 }} />}
                       </div>
-                      <div style={{ fontSize: 10, color: C.t2, marginTop: 2, lineHeight: 1.4 }}>{n.message}</div>
-                      <div style={{ fontSize: 9, color: C.t3, marginTop: 4 }}>{timeAgo(n.createdAt)}</div>
+                      <div style={{ fontSize: 12, color: C.t2, marginTop: 2, lineHeight: 1.4 }}>{n.message}</div>
+                      <div style={{ fontSize: 11, color: C.t3, marginTop: 4 }}>{timeAgo(n.createdAt)}</div>
                     </div>
                   </button>
                 );

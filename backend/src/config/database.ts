@@ -13,13 +13,27 @@ import logger from "./logger";
 const url = process.env.DB_HOST ? "" : (process.env.DATABASE_URL || "").trim();
 const usaSsl = (process.env.DB_SSL || "").toLowerCase() === "true";
 
+/**
+ * Sincronización de esquema:
+ *  - desarrollo/test → `synchronize: true` (TypeORM crea/ajusta tablas solo).
+ *  - producción      → `synchronize: false` y se aplican migraciones
+ *    explícitas con `npm run migration:run`. Así los cambios de esquema son
+ *    versionados y no se pierden datos.
+ * Se puede forzar con DB_SYNCHRONIZE=true|false.
+ */
+const nodeEnv = (process.env.NODE_ENV || "development").toLowerCase();
+const syncEnv = (process.env.DB_SYNCHRONIZE || "").toLowerCase();
+const synchronize =
+  syncEnv === "true" ? true : syncEnv === "false" ? false : nodeEnv !== "production";
+
 const comun = {
   type: "postgres" as const,
   ssl: usaSsl ? { rejectUnauthorized: false } : false,
-  synchronize: true,
+  synchronize,
   logging: false,
   entities: [__dirname + "/../models/**/*.{js,ts}"],
   migrations: [__dirname + "/../migrations/**/*.{js,ts}"],
+  migrationsRun: false,
   subscribers: [],
 };
 

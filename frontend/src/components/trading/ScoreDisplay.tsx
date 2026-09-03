@@ -30,7 +30,7 @@ export default function ScoreDisplay({ score, confidence, size = "md", showRing 
   const inner = (
     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
       <span style={{ fontSize: size === "lg" ? 17 : size === "md" ? 14 : 11, fontWeight: 800, color: C.t1, lineHeight: 1 }}>{score}</span>
-      <span style={{ fontSize: 6, color: color, fontWeight: 700, letterSpacing: 0.5 }}>{label}</span>
+      <span style={{ fontSize: 8, color: color, fontWeight: 700, letterSpacing: 0.5 }}>{label}</span>
     </div>
   );
 
@@ -43,11 +43,11 @@ export default function ScoreDisplay({ score, confidence, size = "md", showRing 
         </div>
       )}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: C.t1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: C.t1 }}>
           <Sparkles size={12} color={color} />
           Score IA de acierto
         </div>
-        <div style={{ fontSize: 9, color: C.t3, marginTop: 2 }}>
+        <div style={{ fontSize: 11, color: C.t3, marginTop: 2 }}>
           {confidence ? `Confianza del ${Math.round(confidence * 100)}% · ` : ""}
           Ensamble LSTM + RF + XGB
         </div>

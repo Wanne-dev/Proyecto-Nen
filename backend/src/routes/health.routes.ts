@@ -5,9 +5,18 @@ import { EMAIL_PROVIDER } from "../config/email";
 const router = Router();
 
 /**
- * Health check real: lanza una consulta a la base de datos.
- * Docker usa este endpoint para saber si el backend esta sano de verdad.
- * Devuelve 503 si la base no responde, para que el healthcheck falle.
+ * @swagger
+ * /v1/health:
+ *   get:
+ *     summary: Estado del servicio
+ *     description: Verifica que la API y su base de datos respondan.
+ *     security: []
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Servicio operativo
+ *       503:
+ *         description: Base de datos no disponible
  */
 router.get("/health", async (_req: Request, res: Response) => {
   let baseDatos = "desconectada";

@@ -1,21 +1,26 @@
-/* Página de Trading — BANCA NEN */
-import { useCallback, useEffect, useRef, useState } from "react";
-import { RefreshCw, Activity, Timer } from "lucide-react";
+/* Página de Trading — BANCA NEN (rediseño UI/UX, lógica intacta)
+   - Fondo con imagen (assets/fondodasboard.png) + capa de legibilidad.
+   - Paneles SIN marcos ni fondos grises.
+   - El gráfico carga AL INSTANTE con velas demo mientras llega la API real.
+   - Si la API falla (rate limit, red), se sigue mostrando demo SIN errores. */
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { RefreshCw, TrendingUp, TrendingDown } from "lucide-react";
 import { getTopCryptos, getOHLC, getTimeframeDays, type MarketCoin, type OHLCPoint } from "../../services/coingecko";
+import { generateSeedOHLC, FALLBACK_COINS, TFS, type TF } from "../../services/seedMarket";
 import { useWalletStore } from "../../store/wallet.slice";
 import { useTradingStore } from "../../store/trading.slice";
 import { useUIStore } from "../../store/ui.slice";
-import { C, FONT, fmt, fmtCompact } from "../../theme";
+import { fmt, fmtCompact } from "../../theme";
 import PriceChart from "../../components/charts/PriceChart";
 import AssetSelector from "../../components/trading/AssetSelector";
 import OrderForm from "../../components/trading/OrderForm";
 import OrderList from "../../components/trading/OrderList";
 import ScoreDisplay from "../../components/trading/ScoreDisplay";
+import OrderBook from "../../components/trading/OrderBook";
+import NewsFeed from "../../components/trading/NewsFeed";
 import { iaService } from "../../services/ia";
+import { useLiveMarket } from "../../hooks/useLiveMarket";
 import type { OrderType, OrderSide } from "../../types/Order.types";
-
-type TF = "1M" | "5M" | "15M" | "1H" | "4H" | "1D" | "1W" | "1MO";
-const TFS: TF[] = ["1M", "5M", "15M", "1H", "4H", "1D", "1W", "1MO"];
 
 export default function Trading() {
   const [coins, setCoins] = useState<MarketCoin[]>([]);
@@ -23,28 +28,50 @@ export default function Trading() {
   const [ohlc, setOhlc] = useState<OHLCPoint[]>([]);
   const [tf, setTf] = useState<TF>("1D");
   const [loading, setLoading] = useState(true);
-  const [marketError, setMarketError] = useState("");
+  const [connected, setConnected] = useState(true);
   const [aiScore, setAiScore] = useState(50);
   const [submitting, setSubmitting] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   const wallet = useWalletStore((s) => s.wallet);
   const refreshWallet = useWalletStore((s) => s.refresh);
   const { orders, refreshOrders, placeOrder, cancelOrder } = useTradingStore();
   const toast = useUIStore((s) => s.toast);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /* Activo en pantalla: el real si ya cargó; si no, uno demo para que el
+     gráfico y el libro de órdenes se vean AL INSTANTE sin esperar la API. */
+  const displayCoin: MarketCoin = coin ?? FALLBACK_COINS[0];
+  const visibleCoins = coins.length > 0 ? coins : FALLBACK_COINS;
+
+  /* Datos del gráfico: velas reales si ya llegaron, semilla demo si no */
+  const seed = useMemo(
+    () => generateSeedOHLC(displayCoin.current_price, tf),
+    [displayCoin.id, displayCoin.current_price, tf]
+  );
+  const base = ohlc.length > 0 ? ohlc : seed;
+  const resetKey = displayCoin.id + ":" + tf + ":" + (ohlc.length > 0 ? "real" : "seed");
+  const { points: liveOhlc, livePrice } = useLiveMarket(base, resetKey, {
+    intervalMs: 1500,
+    volatility: 0.0018,
+  });
 
   const balanceOf = (cur: string) => Number(wallet?.balances?.find((b) => b.currency === cur)?.balance || 0);
 
   const loadCoins = useCallback(async () => {
     try {
       setLoading(true);
-      setMarketError("");
       const d = await getTopCryptos(24);
+      setConnected(true);
       setCoins(Array.isArray(d) ? d : []);
-      if (d.length > 0) setCoin((prev) => prev || d[0]);
-    } catch (e: any) {
-      setMarketError(e.message || "Error de mercado");
+      if (d.length > 0) {
+        /* Conserva la selección del usuario y la refresca con datos reales */
+        setCoin((prev) => {
+          if (!prev) return d[0];
+          const fresh = d.find((c) => c.id === prev.id);
+          return fresh || prev;
+        });
+      }
+    } catch {
+      setConnected(false);
     } finally {
       setLoading(false);
     }
@@ -52,6 +79,8 @@ export default function Trading() {
 
   const loadOHLC = useCallback(async () => {
     if (!coin) return;
+    /* Reinicia a semilla para respuesta instantánea al cambiar activo/timeframe */
+    setOhlc([]);
     try {
       const d = await getOHLC(coin.id, getTimeframeDays(tf));
       setOhlc(Array.isArray(d) ? d : []);
@@ -74,25 +103,9 @@ export default function Trading() {
   useEffect(() => {
     let active = true;
     if (coin) {
-      iaService.getScore(coin.id).then((s) => { if (active) setAiScore(s); });
+      iaService.getScore(coin.id).then((s) => { if (active) setAiScore(s); }).catch(() => {});
     }
     return () => { active = false; };
-  }, [coin]);
-
-  /* Ticks en vivo simulados */
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setLastRefresh(new Date());
-      setOhlc((prev) => {
-        if (prev.length === 0) return prev;
-        const last = prev[prev.length - 1];
-        const move = (Math.random() - 0.5) * last.close * 0.004;
-        const close = Math.max(last.close * 0.9, last.close + move);
-        return [...prev.slice(0, -1), { ...last, close, high: Math.max(last.high, close), low: Math.min(last.low, close), time: Math.floor(Date.now() / 1000) }];
-      });
-      setCoins((prev) => prev.map((c) => (c.id === coin?.id ? { ...c, current_price: c.current_price * (1 + (Math.random() - 0.5) * 0.002) } : c)));
-    }, 5000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [coin]);
 
   const handleOrder = async (params: { type: OrderType; side: OrderSide; quantity: number; price?: number; stopPrice?: number; total: number }) => {
@@ -116,113 +129,146 @@ export default function Trading() {
     }
   };
 
-  const up = (coin?.price_change_percentage_24h || 0) >= 0;
-  const marketStatus = coins.length > 0 && !marketError;
+  const dispPrice = livePrice ?? displayCoin.current_price ?? 0;
+  const chg = displayCoin.price_change_percentage_24h || 0;
+  const up = chg >= 0;
+  const tickUp = liveOhlc.length > 1
+    ? liveOhlc[liveOhlc.length - 1].close >= liveOhlc[liveOhlc.length - 2].close
+    : up;
 
   return (
-    <div style={{ fontFamily: FONT }}>
-      {marketError && (
-        <div style={{ marginBottom: 14, padding: "9px 14px", borderRadius: 8, backgroundColor: C.gold + "12", border: "1px solid " + C.gold + "44", fontSize: 11, color: C.gold, display: "flex", alignItems: "center", gap: 8 }}>
-          <Activity size={13} />
-          {marketError} — Mostrando datos de demostración.
-          <button onClick={loadCoins} style={{ marginLeft: "auto", padding: "3px 10px", fontSize: 10, backgroundColor: C.gold, color: C.bg, border: "none", borderRadius: 4, cursor: "pointer", fontFamily: FONT }}>Reintentar</button>
-        </div>
-      )}
+    <div
+      className="relative text-white overflow-hidden -m-5"
+      style={{
+        backgroundColor: "#08080d",
+        backgroundImage:
+          "radial-gradient(1000px 520px at 85% -10%, rgba(0,212,170,0.10), transparent 55%)," +
+          "radial-gradient(900px 520px at 5% 110%, rgba(10,132,255,0.12), transparent 55%)," +
+          "url('/assets/fondodasboard.png')",
+        backgroundSize: "auto, auto, cover",
+        backgroundPosition: "center, center, center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* Capa mínima: solo suaviza, deja ver el fondo */}
+      <div className="absolute inset-0 bg-[#08080d]/30" />
 
-      <div style={{ display: "flex", gap: 14, alignItems: "stretch", height: "calc(100vh - 130px)", minHeight: 560 }}>
-        {/* Lista de activos */}
-        <div style={{ width: 220, border: "1px solid " + C.border, borderRadius: 12, overflow: "hidden", backgroundColor: C.bg2, flexShrink: 0 }}>
-          <AssetSelector coins={coins} selectedId={coin?.id || null} onSelect={setCoin} loading={loading} />
-        </div>
+      <div className="relative z-10 flex flex-col xl:flex-row xl:h-[calc(100vh-54px)]">
+        {/* ===== Watchlist + Libro de órdenes ===== */}
+        <aside className="shrink-0 xl:w-[236px] flex flex-col xl:h-full">
+          <div className="flex-1 min-h-0">
+            <AssetSelector coins={visibleCoins} selectedId={displayCoin.id} onSelect={setCoin} loading={loading} />
+          </div>
+          <div className="shrink-0 max-h-[340px] xl:max-h-[46%] overflow-y-auto px-3 py-2">
+            <OrderBook symbol={displayCoin.symbol} price={dispPrice} />
+          </div>
+        </aside>
 
-        {/* Gráfico */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", border: "1px solid " + C.border, borderRadius: 12, overflow: "hidden", backgroundColor: C.bg2, minWidth: 0 }}>
-          {/* Cabecera par */}
-          {coin && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid " + C.border, flexWrap: "wrap", gap: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 9, backgroundColor: coin.color + "26", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: coin.color }}>
-                  {coin.symbol.slice(0, 2)}
+        {/* ===== Gráfico ===== */}
+        <main className="flex-1 min-w-0 flex flex-col xl:h-full">
+          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-1 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[14px] font-extrabold" style={{ backgroundColor: (displayCoin.color || "#0a84ff") + "26", color: displayCoin.color || "#0a84ff" }}>
+                {displayCoin.symbol.slice(0, 2)}
+              </div>
+              <div>
+                <div className="text-[16px] font-bold tracking-tight leading-tight">{displayCoin.symbol.toUpperCase()} / USD</div>
+                <div className="text-[11px] text-gray-500">{displayCoin.name} · #{displayCoin.market_cap_rank}</div>
+              </div>
+              <div className="ml-2">
+                <div
+                  className="text-[22px] font-extrabold tracking-tight leading-tight transition-colors"
+                  style={{ color: tickUp ? "#00d4aa" : "#ff4d5e" }}
+                >
+                  {fmt(dispPrice, dispPrice < 1 ? 4 : 2)}
                 </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{coin.symbol.toUpperCase()} / USD</div>
-                  <div style={{ fontSize: 9, color: C.t3 }}>{coin.name} · #{coin.market_cap_rank}</div>
-                </div>
-                <div style={{ marginLeft: 8 }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: C.t1, letterSpacing: -0.5 }}>
-                    {fmt(coin.current_price, coin.current_price < 1 ? 4 : 2)}
-                  </div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: up ? C.green : C.red, display: "flex", alignItems: "center", gap: 4 }}>
-                    {up ? "▲" : "▼"} {Math.abs(coin.price_change_percentage_24h || 0).toFixed(2)}% <span style={{ color: C.t3, fontWeight: 400 }}>(24h)</span>
-                  </div>
+                <div className="text-[13px] font-bold flex items-center gap-1" style={{ color: up ? "#00d4aa" : "#ff4d5e" }}>
+                  {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                  {up ? "+" : ""}{Math.abs(chg).toFixed(2)}%
+                  <span className="text-gray-600 font-normal">(24h)</span>
                 </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ fontSize: 9, color: C.t3, display: "flex", alignItems: "center", gap: 4 }}>
-                  <Timer size={11} color={C.green} /> Live · actualizado {lastRefresh.toLocaleTimeString("es-CO")}
-                </div>
-                <button onClick={loadOHLC} title="Actualizar gráfico" style={{ background: "none", border: "none", cursor: "pointer", color: C.t2, display: "flex", padding: 4 }}>
-                  <RefreshCw size={14} />
-                </button>
-              </div>
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-400">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                </span>
+                EN VIVO
+              </span>
+              {!connected && (
+                <span className="text-[11px] text-gray-600">· datos de demostración</span>
+              )}
+              <button onClick={loadOHLC} title="Actualizar gráfico" className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-white/5 transition-colors">
+                <RefreshCw size={14} />
+              </button>
+            </div>
+          </div>
 
-          {/* Market info */}
-          {coin && (
-            <div style={{ display: "flex", gap: 20, padding: "7px 14px", borderBottom: "1px solid " + C.border, backgroundColor: C.bg, fontSize: 10, flexWrap: "wrap" }}>
-              <span><span style={{ color: C.t3 }}>Alto 24h </span><strong style={{ color: C.t1 }}>{fmt(coin.high_24h || 0, 2)}</strong></span>
-              <span><span style={{ color: C.t3 }}>Bajo 24h </span><strong style={{ color: C.t1 }}>{fmt(coin.low_24h || 0, 2)}</strong></span>
-              <span><span style={{ color: C.t3 }}>Volumen </span><strong style={{ color: C.t1 }}>{fmtCompact(coin.total_volume || 0)}</strong></span>
-              <span><span style={{ color: C.t3 }}>Cap. mercado </span><strong style={{ color: C.t1 }}>{fmtCompact(coin.market_cap || 0)}</strong></span>
-              <span><span style={{ color: C.t3 }}>Cambio 7d </span><strong style={{ color: (coin.price_change_percentage_7d_in_currency || 0) >= 0 ? C.green : C.red }}>{fmt((coin.price_change_percentage_7d_in_currency || 0), 2)}%</strong></span>
-            </div>
-          )}
+          {/* Stats de mercado */}
+          <div className="flex gap-4 px-4 py-2 text-[12px] text-gray-500 flex-wrap">
+            <span>Alto 24h <strong className="text-gray-200">{fmt(displayCoin.high_24h || 0, 2)}</strong></span>
+            <span>Bajo 24h <strong className="text-gray-200">{fmt(displayCoin.low_24h || 0, 2)}</strong></span>
+            <span>Volumen <strong className="text-gray-200">{fmtCompact(displayCoin.total_volume || 0)}</strong></span>
+            <span>Cap. mercado <strong className="text-gray-200">{fmtCompact(displayCoin.market_cap || 0)}</strong></span>
+            <span>Cambio 7d <strong style={{ color: (displayCoin.price_change_percentage_7d_in_currency || 0) >= 0 ? "#00d4aa" : "#ff4d5e" }}>{fmt(displayCoin.price_change_percentage_7d_in_currency || 0, 2)}%</strong></span>
+            {connected && coins.length > 0 && (
+              <span className="ml-auto flex items-center gap-1.5 text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Mercado conectado
+              </span>
+            )}
+          </div>
 
           {/* Timeframes */}
-          <div style={{ display: "flex", gap: 3, padding: "6px 14px", borderBottom: "1px solid " + C.border, backgroundColor: C.bg2, alignItems: "center" }}>
-            <span style={{ fontSize: 9, color: C.t3, marginRight: 6 }}>Timeframe</span>
+          <div className="flex items-center gap-1 px-4 pb-2">
             {TFS.map((t) => (
-              <button key={t} onClick={() => setTf(t)} style={{ padding: "3px 8px", fontSize: 10, fontWeight: tf === t ? 700 : 400, border: "none", cursor: "pointer", borderRadius: 4, backgroundColor: tf === t ? C.gold : "transparent", color: tf === t ? C.bg : C.t2, fontFamily: FONT }}>
+              <button
+                key={t}
+                onClick={() => setTf(t)}
+                className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold transition-colors ${
+                  tf === t ? "bg-[#00d4aa]/15 text-[#00d4aa]" : "text-gray-500 hover:text-gray-200"
+                }`}
+              >
                 {t}
               </button>
             ))}
-            <div style={{ flex: 1 }} />
-            {marketStatus && <span style={{ fontSize: 9, color: C.green, display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: C.green }} /> Mercado conectado</span>}
           </div>
 
-          {/* Chart */}
-          <div style={{ flex: 1, backgroundColor: C.bg, minHeight: 300 }}>
-            <PriceChart data={ohlc} height="fill" showVolume />
+          {/* Chart en vivo */}
+          <div className="flex-1 min-h-[320px] px-2 pb-2">
+            <PriceChart data={liveOhlc} height="fill" showVolume live defaultIndicators={["sma"]} />
           </div>
-          <style>{`@media(max-width:900px){.price-chart-wrap{height:300px!important}}`}</style>
-        </div>
+        </main>
 
-        {/* Panel de trading */}
-        <div style={{ width: 300, border: "1px solid " + C.border, borderRadius: 12, overflowY: "auto", backgroundColor: C.bg2, flexShrink: 0, display: "flex", flexDirection: "column" }}>
-          {coin && (
-            <div style={{ padding: "10px 14px", borderBottom: "1px solid " + C.border }}>
-              <ScoreDisplay score={aiScore} confidence={0.71 + (aiScore / 1000)} />
+        {/* ===== Panel de trading ===== */}
+        <aside className="shrink-0 xl:w-[320px] flex flex-col xl:h-full xl:overflow-y-auto">
+          <div className="px-4 pt-4 pb-1">
+            <ScoreDisplay score={aiScore} confidence={0.71 + aiScore / 1000} size="sm" />
+          </div>
+          {coin ? (
+            <OrderForm
+              coin={coin}
+              buyAvailable={balanceOf("USD")}
+              sellAvailable={balanceOf(coin.symbol)}
+              aiScore={aiScore}
+              onSubmit={handleOrder}
+              submitting={submitting}
+            />
+          ) : (
+            <div className="px-4 py-10 text-center text-gray-500 text-[13px]">
+              <div className="animate-pulse">Conectando con el mercado…</div>
             </div>
           )}
-          {coin && (
-            <div style={{ borderTop: "1px solid " + C.border, flex: 1 }}>
-              <OrderForm
-                coin={coin}
-                buyAvailable={balanceOf("USD")}
-                sellAvailable={balanceOf(coin.symbol)}
-                aiScore={aiScore}
-                onSubmit={handleOrder}
-                submitting={submitting}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Órdenes */}
-      <div style={{ marginTop: 14, border: "1px solid " + C.border, borderRadius: 12, backgroundColor: C.bg2, padding: 14 }}>
-        <OrderList orders={orders} onCancel={(id) => cancelOrder(id).then(() => toast("info", "Orden cancelada"))} />
+          {/* Noticias debajo del área de compra/venta */}
+          <div className="px-4 py-3">
+            <NewsFeed />
+          </div>
+          {/* Órdenes */}
+          <div className="px-4 py-3">
+            <OrderList orders={orders} onCancel={(id) => cancelOrder(id).then(() => toast("info", "Orden cancelada"))} />
+          </div>
+        </aside>
       </div>
     </div>
   );

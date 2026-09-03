@@ -1,8 +1,7 @@
-/* Selector de activo — BANCA NEN */
+/* Selector de activo — BANCA NEN (diseño moderno, lógica intacta) */
 import { useState } from "react";
-import { Search, TrendingUp, TrendingDown } from "lucide-react";
+import { Search } from "lucide-react";
 import type { MarketCoin } from "../../services/coingecko";
-import { C, FONT } from "../../theme";
 
 interface Props {
   coins: MarketCoin[];
@@ -18,21 +17,21 @@ export default function AssetSelector({ coins, selectedId, onSelect, loading }: 
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", fontFamily: FONT, height: "100%" }}>
-      <div style={{ padding: 10, borderBottom: "1px solid " + C.border }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 9px", borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border }}>
-          <Search size={13} color={C.t3} />
+    <div className="flex flex-col h-full text-white">
+      <div className="p-3">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 focus-within:border-[#00d4aa]/50 transition-colors">
+          <Search size={13} className="text-gray-500" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar activo..."
-            style={{ background: "none", border: "none", outline: "none", color: C.t1, fontSize: 11, width: "100%", fontFamily: FONT }}
+            className="bg-transparent border-none outline-none text-[14px] text-white placeholder-gray-600 w-full"
           />
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto" }}>
+      <div className="flex-1 overflow-y-auto px-1.5 pb-2">
         {loading && filtered.length === 0 && (
-          <div style={{ padding: 20, textAlign: "center", color: C.t3, fontSize: 11 }}>Cargando mercado...</div>
+          <div className="p-6 text-center text-gray-600 text-[13px]">Cargando mercado...</div>
         )}
         {filtered.map((c) => {
           const active = c.id === selectedId;
@@ -41,25 +40,23 @@ export default function AssetSelector({ coins, selectedId, onSelect, loading }: 
             <div
               key={c.id}
               onClick={() => onSelect(c)}
-              style={{
-                display: "flex", alignItems: "center", gap: 8, padding: "7px 12px", cursor: "pointer",
-                backgroundColor: active ? C.card : "transparent",
-                borderLeft: "2px solid " + (active ? C.gold : "transparent"),
-              }}
+              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer transition-colors ${
+                active ? "bg-[#00d4aa]/[0.08]" : "hover:bg-white/[0.03]"
+              }`}
+              style={active ? { boxShadow: "inset 0 0 0 1px rgba(0,212,170,0.25)" } : undefined}
             >
-              <div style={{ width: 26, height: 26, borderRadius: "50%", backgroundColor: c.color + "26", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: c.color, flexShrink: 0 }}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0" style={{ backgroundColor: (c.color || "#0a84ff") + "26", color: c.color || "#0a84ff" }}>
                 {c.symbol.slice(0, 2)}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.t1 }}>{c.symbol.toUpperCase()}</div>
-                <div style={{ fontSize: 9, color: C.t3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[14px] font-semibold text-gray-100">{c.symbol.toUpperCase()}</div>
+                <div className="text-[11px] text-gray-600 truncate">{c.name}</div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.t1 }}>
+              <div className="text-right">
+                <div className="text-[14px] font-semibold text-gray-200">
                   ${c.current_price.toLocaleString(undefined, { maximumFractionDigits: c.current_price < 1 ? 4 : 2 })}
                 </div>
-                <div style={{ fontSize: 9, fontWeight: 600, color: up ? C.green : C.red, display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}>
-                  {up ? <TrendingUp size={9} /> : <TrendingDown size={9} />}
+                <div className="text-[11px] font-semibold" style={{ color: up ? "#00d4aa" : "#ff4d5e" }}>
                   {up ? "+" : ""}{c.price_change_percentage_24h?.toFixed(2)}%
                 </div>
               </div>
@@ -67,7 +64,7 @@ export default function AssetSelector({ coins, selectedId, onSelect, loading }: 
           );
         })}
         {!loading && filtered.length === 0 && (
-          <div style={{ padding: 20, textAlign: "center", color: C.t3, fontSize: 11 }}>Sin resultados</div>
+          <div className="p-6 text-center text-gray-600 text-[13px]">Sin resultados</div>
         )}
       </div>
     </div>

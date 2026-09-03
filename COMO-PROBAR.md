@@ -58,7 +58,15 @@ Si sigue fallando, mira el mensaje:
 | Arrancar backend + frontend | `pnpm dev` |
 | Solo backend | `pnpm dev:back` |
 | Solo frontend | `pnpm dev:front` |
+| Compilar backend | `pnpm build:back` |
 | Compilar frontend | `pnpm build:front` |
+| Compilar todo | `pnpm build` |
+| Typecheck (back + front) | `pnpm typecheck` |
+| Tests backend | `pnpm test:back` |
+| Tests frontend | `pnpm test:front` |
+| **Todos los tests** | `pnpm test` |
+| Lint frontend | `pnpm lint` |
+| Tests del servicio IA | `cd ia-service && python -m pytest` |
 | Apagar la base de datos | `docker compose down` |
 
 ---

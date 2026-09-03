@@ -28,8 +28,8 @@ export default function BalanceCard({ totalUsd, pnlPct, loading }: Props) {
           <Wallet size={16} color={C.gold} />
         </span>
         <div>
-          <div style={{ fontSize: 10, color: C.t3, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Balance total</div>
-          <div style={{ fontSize: 9, color: C.t3 }}>Multi-moneda estandarizado en USD</div>
+          <div style={{ fontSize: 12, color: C.t3, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Balance total</div>
+          <div style={{ fontSize: 11, color: C.t3 }}>Multi-moneda estandarizado en USD</div>
         </div>
       </div>
       {loading ? (
@@ -38,7 +38,7 @@ export default function BalanceCard({ totalUsd, pnlPct, loading }: Props) {
         <div style={{ fontSize: 34, fontWeight: 800, color: C.t1, letterSpacing: -1 }}>{fmt(totalUsd)}</div>
       )}
       {pnlPct !== undefined && (
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 11 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 13 }}>
           <span style={{ fontWeight: 700, color: up ? C.green : C.red }}>
             {up ? "▲" : "▼"} {Math.abs(pnlPct).toFixed(2)}%
           </span>

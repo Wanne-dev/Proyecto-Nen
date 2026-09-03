@@ -5,13 +5,15 @@
    ============================================================ */
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
+import { validateQuery } from "../middleware/validation.middleware";
+import { reportQuerySchema } from "../validators/report.validator";
 import { getPortfolioReport, getTransactionsReport } from "../controllers/report.controller";
 
 const router = Router();
 
 router.use(authenticate);
 
-router.get("/portfolio", getPortfolioReport);
-router.get("/transactions", getTransactionsReport);
+router.get("/portfolio", validateQuery(reportQuerySchema), getPortfolioReport);
+router.get("/transactions", validateQuery(reportQuerySchema), getTransactionsReport);
 
 export default router;

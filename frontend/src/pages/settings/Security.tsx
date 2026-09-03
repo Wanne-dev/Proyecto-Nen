@@ -58,7 +58,7 @@ export default function Security() {
   };
 
   const fieldStyle: React.CSSProperties = {
-    width: "100%", padding: "8px 10px", fontSize: 12, borderRadius: 6, backgroundColor: C.card,
+    width: "100%", padding: "8px 10px", fontSize: 14, borderRadius: 6, backgroundColor: C.card,
     border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT,
   };
 
@@ -78,7 +78,7 @@ export default function Security() {
               <KeyRound size={19} color={C.green} />
             </span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, color: C.t2, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 14, color: C.t2, lineHeight: 1.5 }}>
                 {user?.twoFactorEnabled
                   ? "Tu cuenta está protegida con códigos TOTP que cambian cada 30 segundos. Es obligatorio para retiros."
                   : "Activa 2FA para proteger tu cuenta. El 2FA es obligatorio para retiros y operaciones de alto valor."}
@@ -120,12 +120,12 @@ export default function Security() {
                 <Smartphone size={15} color={s.isBlocked ? C.red : C.blue} />
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, color: C.t1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 700, color: C.t1 }}>
                   {s.device}
                   {s.isCurrent && <Badge tone="green">Esta sesión</Badge>}
                   {s.isBlocked && <Badge tone="red"><ShieldAlert size={9} /> Bloqueada</Badge>}
                 </div>
-                <div style={{ fontSize: 9, color: C.t3 }}>
+                <div style={{ fontSize: 11, color: C.t3 }}>
                   {s.location} · {s.ip} · activa {timeAgo(s.lastActiveAt)}
                 </div>
               </div>
@@ -150,7 +150,7 @@ export default function Security() {
               {questions.map((q) => (
                 <div key={q.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "1px solid " + C.border }}>
                   <Globe size={13} color={C.gold} />
-                  <span style={{ flex: 1, fontSize: 11, color: C.t1 }}>{q.question}</span>
+                  <span style={{ flex: 1, fontSize: 13, color: C.t1 }}>{q.question}</span>
                   <button
                     onClick={() => { setQuestions(questions.filter((x) => x.id !== q.id)); toast("info", "Pregunta eliminada"); }}
                     style={{ background: "none", border: "none", cursor: "pointer", color: C.t3, display: "flex" }}
@@ -173,12 +173,12 @@ export default function Security() {
                 <Fingerprint size={17} color={C.purple} />
               </span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>Desbloqueo biométrico</div>
-                <div style={{ fontSize: 9, color: C.t3 }}>Inicia sesión con huella o Face ID desde tu dispositivo</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>Desbloqueo biométrico</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>Inicia sesión con huella o Face ID desde tu dispositivo</div>
               </div>
               <Toggle checked={bioEnabled} onChange={(v) => { setBioEnabled(v); toast("success", v ? "Biometría activada" : "Biometría desactivada"); }} />
             </div>
-            <div style={{ padding: "4px 14px 12px", fontSize: 9, color: C.t3 }}>
+            <div style={{ padding: "4px 14px 12px", fontSize: 11, color: C.t3 }}>
               Los datos biométricos nunca salen del dispositivo (Secure Enclave / Keychain).
             </div>
           </Card>
@@ -187,7 +187,7 @@ export default function Security() {
 
       {/* Modal confirmar desactivar 2FA */}
       <Modal open={confirmModal} onClose={() => setConfirmModal(false)} title="¿Desactivar 2FA?" subtitle="Esto reduce la seguridad de tu cuenta">
-        <div style={{ fontSize: 12, color: C.t2, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 14, color: C.t2, lineHeight: 1.6 }}>
           Si desactivas la autenticación de dos factores, tu cuenta quedará más expuesta. Los retiros seguirán requiriendo
           biometría y preguntas de seguridad. ¿Deseas continuar?
         </div>

@@ -49,7 +49,7 @@ export class MarketPrice {
   @Column({ type: "decimal", precision: 18, scale: 2 })
   volume: number;
 
-  @Column({ name: "trade_count", default: 0 })
+  @Column({ type: "integer", name: "trade_count", default: 0 })
   tradeCount: number;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })

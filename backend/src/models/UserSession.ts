@@ -18,29 +18,29 @@ export class UserSession {
   @Column({ name: "user_id", type: "uuid" })
   userId: string;
 
-  @Column({ name: "refresh_token", length: 500, unique: true })
+  @Column({ type: "varchar", name: "refresh_token", length: 500, unique: true })
   refreshToken: string;
 
-  @Column({ name: "device_info", nullable: true, length: 255 })
-  deviceInfo: string;
+  @Column({ type: "varchar", name: "device_info", nullable: true, length: 255 })
+  deviceInfo: string | null;
 
   @Column({ name: "user_agent", type: "text", nullable: true })
-  userAgent: string;
+  userAgent: string | null;
 
-  @Column({ name: "ip_address", length: 45, nullable: true })
-  ipAddress: string;
+  @Column({ type: "varchar", name: "ip_address", length: 45, nullable: true })
+  ipAddress: string | null;
 
   @Column({ name: "location", type: "jsonb", nullable: true })
-  location: object;
+  location: object | null;
 
-  @Column({ name: "is_active", default: true })
+  @Column({ type: "boolean", name: "is_active", default: true })
   isActive: boolean;
 
   @Column({ name: "expires_at", type: "timestamptz" })
   expiresAt: Date;
 
   @Column({ name: "last_activity_at", type: "timestamptz", nullable: true })
-  lastActivityAt: Date;
+  lastActivityAt: Date | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

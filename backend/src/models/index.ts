@@ -10,3 +10,4 @@ export { Notification, NotificationType } from "./Notification";
 export { UserSettings } from "./UserSettings";
 export { Asset, AssetType } from "./Asset";
 export { MarketPrice, Timeframe } from "./MarketPrice";
+export { WebhookLog, WebhookStatus } from "./WebhookLog";

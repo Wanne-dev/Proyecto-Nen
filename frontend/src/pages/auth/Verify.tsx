@@ -1,6 +1,110 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/auth.slice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, TrendingUp } from "lucide-react";
+
+/* Línea de valores de la bolsa (igual que login y landing) */
+const TICKER_ITEMS = [
+  { symbol: "BTC/USD", price: "67,432", change: "+2.34%", up: true },
+  { symbol: "ETH/USD", price: "3,521", change: "+1.12%", up: true },
+  { symbol: "EUR/USD", price: "1.0845", change: "-0.12%", up: false },
+  { symbol: "AAPL", price: "198.45", change: "+0.67%", up: true },
+  { symbol: "SPX", price: "5,432", change: "+0.89%", up: true },
+  { symbol: "GOLD", price: "2,412", change: "+0.45%", up: true },
+  { symbol: "NVDA", price: "892", change: "+5.21%", up: true },
+  { symbol: "TSLA", price: "248", change: "+3.67%", up: true },
+];
+
+function TickerBar() {
+  return (
+    <div className="w-full overflow-hidden bg-black/40 backdrop-blur-sm border-b border-white/10 py-2">
+      <motion.div
+        className="flex gap-10 whitespace-nowrap"
+        animate={{ x: [0, -1600] }}
+        transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+      >
+        {[...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+          <span key={i} className="flex items-center gap-2 text-xs font-mono">
+            <span className="text-gray-400">{item.symbol}</span>
+            <span className="text-gray-200">${item.price}</span>
+            <span
+              className={`px-1.5 py-0.5 rounded text-[12px] font-medium ${
+                item.up ? "text-emerald-400 bg-emerald-400/10" : "text-red-400 bg-red-400/10"
+              }`}
+            >
+              {item.change}
+            </span>
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* Fondo compartido de las pantallas de verificación */
+function Shell({ children, subtitle }: { children: React.ReactNode; subtitle: string }) {
+  return (
+    <div className="relative min-h-screen bg-[#0a0a0f] overflow-hidden text-white">
+      {/* Video de fondo */}
+      <div className="absolute inset-0 z-0">
+        <video
+          className="w-full h-full object-cover"
+          src="/assets/videos/login-bg.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/40 via-transparent to-[#0a0a0f]/80" />
+      </div>
+
+      {/* Línea de valores */}
+      <div className="relative z-20">
+        <TickerBar />
+      </div>
+
+      {/* Botón volver al inicio */}
+      <Link
+        to="/"
+        className="absolute top-16 left-4 z-20 inline-flex items-center gap-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md px-4 py-2 text-[15px] text-gray-200 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Volver al inicio
+      </Link>
+
+      {/* Contenido centrado */}
+      <div className="relative z-10 flex items-center justify-center px-4 py-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          {/* Marca */}
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00d4aa] to-[#0a84ff] flex items-center justify-center shadow-lg shadow-[#00d4aa]/20 mb-4">
+              <TrendingUp className="w-7 h-7 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              BANCA <span className="text-[#00d4aa]">NEN</span>
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">{subtitle}</p>
+          </div>
+
+          {children}
+
+          <p className="text-center text-xs text-gray-500 mt-6">
+            © {new Date().getFullYear()} BANCA NEN · Seguridad de nivel bancario
+          </p>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
 
 export default function Verify() {
   const [emailCode, setEmailCode] = useState("");
@@ -53,113 +157,104 @@ export default function Verify() {
 
   if (step === "done") {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-        <div className="w-full max-w-md text-center">
-          <div className="bg-[#1a1a1a] rounded-2xl p-8 shadow-2xl border border-white/5">
-            <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            </div>
-            <h2 className="text-2xl font-semibold text-white mb-2">Cuenta verificada</h2>
-            <p className="text-gray-400 mb-6">Tu identidad ha sido confirmada. Ya puedes operar en BANCA NEN.</p>
-            <button onClick={() => navigate("/dashboard")} className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold py-3 rounded-xl transition-colors">
-              Ir al dashboard
-            </button>
+      <Shell subtitle="Verificacion de identidad">
+        <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10 text-center">
+          <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           </div>
+          <h2 className="text-2xl font-semibold text-white mb-2">Cuenta verificada</h2>
+          <p className="text-gray-400 mb-6">Tu identidad ha sido confirmada. Ya puedes operar en BANCA NEN.</p>
+          <button onClick={() => navigate("/dashboard")} className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold py-3 rounded-xl transition-colors">
+            Ir al dashboard
+          </button>
         </div>
-      </div>
+      </Shell>
     );
   }
 
   const stepDone = step === "email" ? emailVerified : phoneVerified;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-white tracking-tight">BANCA NEN</h1>
-          <p className="text-gray-400 mt-1 text-sm">Verificacion de identidad</p>
-        </div>
-
-        <div className="bg-[#1a1a1a] rounded-2xl p-8 shadow-2xl border border-white/5">
-          {/* Progress */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className={`flex items-center gap-2 ${step === "email" ? "text-[#00d4aa]" : emailVerified ? "text-emerald-400" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${emailVerified ? "bg-emerald-500/20" : step === "email" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>
-                {emailVerified ? "✓" : "1"}
-              </div>
-              <span className="text-sm">Email</span>
+    <Shell subtitle="Verificacion de identidad">
+      <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10">
+        {/* Progress */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className={`flex items-center gap-2 ${step === "email" ? "text-[#00d4aa]" : emailVerified ? "text-emerald-400" : "text-gray-500"}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${emailVerified ? "bg-emerald-500/20" : step === "email" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>
+              {emailVerified ? "✓" : "1"}
             </div>
-            <div className={`flex-1 h-px ${emailVerified ? "bg-emerald-500/30" : "bg-white/10"}`} />
-            <div className={`flex items-center gap-2 ${step === "phone" ? "text-[#00d4aa]" : phoneVerified ? "text-emerald-400" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${phoneVerified ? "bg-emerald-500/20" : step === "phone" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>
-                {phoneVerified ? "✓" : "2"}
-              </div>
-              <span className="text-sm">Telefono</span>
-            </div>
-            <div className={`flex-1 h-px ${phoneVerified ? "bg-emerald-500/30" : "bg-white/10"}`} />
-            <div className={`flex items-center gap-2 ${stepDone ? "text-emerald-400" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${stepDone ? "bg-emerald-500/20" : "bg-white/5"}`}>3</div>
-              <span className="text-sm">Listo</span>
-            </div>
+            <span className="text-sm">Email</span>
           </div>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-              <p className="text-red-400 text-sm">{error}</p>
+          <div className={`flex-1 h-px ${emailVerified ? "bg-emerald-500/30" : "bg-white/10"}`} />
+          <div className={`flex items-center gap-2 ${step === "phone" ? "text-[#00d4aa]" : phoneVerified ? "text-emerald-400" : "text-gray-500"}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${phoneVerified ? "bg-emerald-500/20" : step === "phone" ? "bg-[#00d4aa]/20" : "bg-white/5"}`}>
+              {phoneVerified ? "✓" : "2"}
             </div>
-          )}
-
-          {notice && !error && (
-            <div className="bg-[#00d4aa]/10 border border-[#00d4aa]/20 rounded-lg p-3 mb-4">
-              <p className="text-[#00d4aa] text-sm">{notice}</p>
-            </div>
-          )}
-
-          {step === "email" && (
-            <>
-              <h2 className="text-xl font-semibold text-white mb-2">Verificar email</h2>
-              <p className="text-gray-400 text-sm mb-6">Enviamos un codigo de 6 digitos a <span className="text-white">{user?.email}</span></p>
-              <form onSubmit={handleEmailVerify} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Codigo de email</label>
-                  <input type="text" inputMode="numeric" value={emailCode} onChange={(e) => { setEmailCode(e.target.value.replace(/\D/g, "")); clearError(); setNotice(""); }}
-                    maxLength={6} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-[0.5em] placeholder-gray-500 focus:outline-none focus:border-[#00d4aa] transition-colors font-mono"
-                    placeholder="000000" required />
-                </div>
-                <button type="submit" disabled={isLoading} className="w-full bg-[#00d4aa] hover:bg-[#00b894] disabled:opacity-50 text-black font-semibold py-3 rounded-xl transition-colors">
-                  {isLoading ? "Verificando..." : "Verificar email"}
-                </button>
-              </form>
-              <button onClick={handleResend} disabled={cooldown > 0}
-                className="w-full mt-3 text-sm text-gray-400 hover:text-[#00d4aa] disabled:opacity-40 disabled:hover:text-gray-400 transition-colors">
-                {cooldown > 0 ? `Puedes reenviar en ${cooldown}s` : "No recibiste el codigo? Reenviar"}
-              </button>
-            </>
-          )}
-
-          {step === "phone" && (
-            <>
-              <h2 className="text-xl font-semibold text-white mb-2">Verificar telefono</h2>
-              <p className="text-gray-400 text-sm mb-6">Enviamos un codigo de 6 digitos a <span className="text-white">{user?.phone}</span></p>
-              <form onSubmit={handlePhoneVerify} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Codigo de telefono</label>
-                  <input type="text" inputMode="numeric" value={phoneCode} onChange={(e) => { setPhoneCode(e.target.value.replace(/\D/g, "")); clearError(); setNotice(""); }}
-                    maxLength={6} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-[0.5em] placeholder-gray-500 focus:outline-none focus:border-[#00d4aa] transition-colors font-mono"
-                    placeholder="000000" required />
-                </div>
-                <button type="submit" disabled={isLoading} className="w-full bg-[#00d4aa] hover:bg-[#00b894] disabled:opacity-50 text-black font-semibold py-3 rounded-xl transition-colors">
-                  {isLoading ? "Verificando..." : "Verificar telefono"}
-                </button>
-              </form>
-              <button onClick={handleResend} disabled={cooldown > 0}
-                className="w-full mt-3 text-sm text-gray-400 hover:text-[#00d4aa] disabled:opacity-40 disabled:hover:text-gray-400 transition-colors">
-                {cooldown > 0 ? `Puedes reenviar en ${cooldown}s` : "No recibiste el codigo? Reenviar"}
-              </button>
-            </>
-          )}
+            <span className="text-sm">Telefono</span>
+          </div>
+          <div className={`flex-1 h-px ${phoneVerified ? "bg-emerald-500/30" : "bg-white/10"}`} />
+          <div className={`flex items-center gap-2 ${stepDone ? "text-emerald-400" : "text-gray-500"}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${stepDone ? "bg-emerald-500/20" : "bg-white/5"}`}>3</div>
+            <span className="text-sm">Listo</span>
+          </div>
         </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
+
+        {notice && !error && (
+          <div className="bg-[#00d4aa]/10 border border-[#00d4aa]/20 rounded-lg p-3 mb-4">
+            <p className="text-[#00d4aa] text-sm">{notice}</p>
+          </div>
+        )}
+
+        {step === "email" && (
+          <>
+            <h2 className="text-xl font-semibold text-white mb-2">Verificar email</h2>
+            <p className="text-gray-400 text-sm mb-6">Enviamos un codigo de 6 digitos a <span className="text-white">{user?.email}</span></p>
+            <form onSubmit={handleEmailVerify} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Codigo de email</label>
+                <input type="text" inputMode="numeric" value={emailCode} onChange={(e) => { setEmailCode(e.target.value.replace(/\D/g, "")); clearError(); setNotice(""); }}
+                  maxLength={6} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-[0.5em] placeholder-gray-500 focus:outline-none focus:border-[#00d4aa] transition-colors font-mono"
+                  placeholder="000000" required />
+              </div>
+              <button type="submit" disabled={isLoading} className="w-full bg-[#00d4aa] hover:bg-[#00b894] disabled:opacity-50 text-black font-semibold py-3 rounded-xl transition-colors">
+                {isLoading ? "Verificando..." : "Verificar email"}
+              </button>
+            </form>
+            <button onClick={handleResend} disabled={cooldown > 0}
+              className="w-full mt-3 text-sm text-gray-400 hover:text-[#00d4aa] disabled:opacity-40 disabled:hover:text-gray-400 transition-colors">
+              {cooldown > 0 ? `Puedes reenviar en ${cooldown}s` : "No recibiste el codigo? Reenviar"}
+            </button>
+          </>
+        )}
+
+        {step === "phone" && (
+          <>
+            <h2 className="text-xl font-semibold text-white mb-2">Verificar telefono</h2>
+            <p className="text-gray-400 text-sm mb-6">Enviamos un codigo de 6 digitos a <span className="text-white">{user?.phone}</span></p>
+            <form onSubmit={handlePhoneVerify} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Codigo de telefono</label>
+                <input type="text" inputMode="numeric" value={phoneCode} onChange={(e) => { setPhoneCode(e.target.value.replace(/\D/g, "")); clearError(); setNotice(""); }}
+                  maxLength={6} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-[0.5em] placeholder-gray-500 focus:outline-none focus:border-[#00d4aa] transition-colors font-mono"
+                  placeholder="000000" required />
+              </div>
+              <button type="submit" disabled={isLoading} className="w-full bg-[#00d4aa] hover:bg-[#00b894] disabled:opacity-50 text-black font-semibold py-3 rounded-xl transition-colors">
+                {isLoading ? "Verificando..." : "Verificar telefono"}
+              </button>
+            </form>
+            <button onClick={handleResend} disabled={cooldown > 0}
+              className="w-full mt-3 text-sm text-gray-400 hover:text-[#00d4aa] disabled:opacity-40 disabled:hover:text-gray-400 transition-colors">
+              {cooldown > 0 ? `Puedes reenviar en ${cooldown}s` : "No recibiste el codigo? Reenviar"}
+            </button>
+          </>
+        )}
       </div>
-    </div>
+    </Shell>
   );
 }

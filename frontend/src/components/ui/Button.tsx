@@ -22,10 +22,10 @@ const VARIANTS: Record<Variant, React.CSSProperties> = {
 };
 
 const SIZES: Record<Size, React.CSSProperties> = {
-  xs: { padding: "3px 8px", fontSize: 10, borderRadius: 4 },
-  sm: { padding: "5px 12px", fontSize: 11, borderRadius: 5 },
-  md: { padding: "8px 16px", fontSize: 12, borderRadius: 6 },
-  lg: { padding: "11px 22px", fontSize: 13, borderRadius: 8 },
+  xs: { padding: "3px 8px", fontSize: 12, borderRadius: 4 },
+  sm: { padding: "5px 12px", fontSize: 13, borderRadius: 5 },
+  md: { padding: "8px 16px", fontSize: 14, borderRadius: 6 },
+  lg: { padding: "11px 22px", fontSize: 15, borderRadius: 8 },
 };
 
 export default function Button({

@@ -30,8 +30,8 @@ export default function Toasts() {
           >
             <Icon size={16} color={m.color} style={{ flexShrink: 0, marginTop: 1 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{t.title}</div>
-              {t.message && <div style={{ fontSize: 10, color: C.t2, marginTop: 2 }}>{t.message}</div>}
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{t.title}</div>
+              {t.message && <div style={{ fontSize: 12, color: C.t2, marginTop: 2 }}>{t.message}</div>}
             </div>
             <button onClick={() => dismiss(t.id)} style={{ background: "none", border: "none", cursor: "pointer", color: C.t3, padding: 0, display: "flex" }} aria-label="Cerrar">
               <X size={13} />

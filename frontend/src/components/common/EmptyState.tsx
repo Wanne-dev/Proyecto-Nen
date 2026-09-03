@@ -9,8 +9,8 @@ export default function EmptyState({ icon, title, message, action }: { icon?: Re
       <span style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: C.border + "55", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {icon || <Inbox size={22} color={C.t3} />}
       </span>
-      <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{title}</div>
-      {message && <div style={{ fontSize: 11, color: C.t3, maxWidth: 360 }}>{message}</div>}
+      <div style={{ fontSize: 15, fontWeight: 700, color: C.t1 }}>{title}</div>
+      {message && <div style={{ fontSize: 13, color: C.t3, maxWidth: 360 }}>{message}</div>}
       {action && <div style={{ marginTop: 8 }}>{action}</div>}
     </div>
   );

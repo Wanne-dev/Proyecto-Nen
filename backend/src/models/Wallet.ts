@@ -31,7 +31,7 @@ export class Wallet {
   @Column({ name: "total_balance_usd", type: "decimal", precision: 18, scale: 2, default: 0 })
   totalBalanceUsd: number;
 
-  @Column({ name: "is_active", default: true })
+  @Column({ type: "boolean", name: "is_active", default: true })
   isActive: boolean;
 
   @Column({ name: "daily_withdrawal_limit", type: "decimal", precision: 18, scale: 2, default: 5000 })
@@ -41,7 +41,7 @@ export class Wallet {
   dailyWithdrawn: number;
 
   @Column({ name: "daily_withdrawn_reset", type: "timestamptz", nullable: true })
-  dailyWithdrawnReset: Date;
+  dailyWithdrawnReset: Date | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

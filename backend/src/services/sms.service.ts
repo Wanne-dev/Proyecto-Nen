@@ -1,2 +1,5 @@
-// Archivo: backend/src/services/sms.service.ts
-// Propósito: Envío de SMS
+/* ============================================================
+   BANCA NEN â€” Servicio de SMS
+   Re-exporta la implementaciÃ³n real de config/sms.
+   ============================================================ */
+export { sendVerificationSMS, sendPasswordResetSMS } from "../config/sms";

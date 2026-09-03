@@ -38,40 +38,40 @@ export class AuditLog {
   id: string;
 
   @Column({ name: "user_id", type: "uuid", nullable: true })
-  userId: string;
+  userId: string | null;
 
   @Column({ type: "enum", enum: AuditAction })
   action: AuditAction;
 
-  @Column({ name: "entity_type", length: 50, nullable: true })
-  entityType: string;
+  @Column({ type: "varchar", name: "entity_type", length: 50, nullable: true })
+  entityType: string | null;
 
-  @Column({ name: "entity_id", nullable: true, length: 100 })
-  entityId: string;
+  @Column({ type: "varchar", name: "entity_id", nullable: true, length: 100 })
+  entityId: string | null;
 
   @Column({ name: "old_values", type: "jsonb", nullable: true })
-  oldValues: object;
+  oldValues: object | null;
 
   @Column({ name: "new_values", type: "jsonb", nullable: true })
-  newValues: object;
+  newValues: object | null;
 
-  @Column({ name: "prev_hash", length: 64, nullable: true })
-  prevHash: string;
+  @Column({ type: "varchar", name: "prev_hash", length: 64, nullable: true })
+  prevHash: string | null;
 
-  @Column({ name: "curr_hash", length: 64, nullable: true })
-  currHash: string;
+  @Column({ type: "varchar", name: "curr_hash", length: 64, nullable: true })
+  currHash: string | null;
 
-  @Column({ name: "ip_address", length: 45, nullable: true })
-  ipAddress: string;
+  @Column({ type: "varchar", name: "ip_address", length: 45, nullable: true })
+  ipAddress: string | null;
 
   @Column({ name: "user_agent", type: "text", nullable: true })
-  userAgent: string;
+  userAgent: string | null;
 
   @Column({ name: "risk_score", nullable: true, type: "decimal", precision: 5, scale: 2 })
-  riskScore: number;
+  riskScore: number | null;
 
   @Column({ type: "text", nullable: true })
-  details: string;
+  details: string | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

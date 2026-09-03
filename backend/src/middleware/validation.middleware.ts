@@ -13,3 +13,16 @@ export const validate = (schema: ObjectSchema) => {
     next();
   };
 };
+
+/** Valida los parámetros de consulta (req.query) con un esquema Joi. */
+export const validateQuery = (schema: ObjectSchema) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const { error } = schema.validate(req.query, { abortEarly: false, convert: true });
+    if (error) {
+      const messages = error.details.map((d) => d.message).join(", ");
+      next(new AppError(messages, 400));
+      return;
+    }
+    next();
+  };
+};

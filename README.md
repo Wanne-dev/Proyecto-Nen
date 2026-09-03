@@ -492,8 +492,8 @@ pnpm --filter banca-nen-frontend <script>
 1. **Clonar el repositorio**
 
 ```bash
-git clone https://github.com/tu-usuario/banca-nen.git
-cd banca-nen
+git clone https://github.com/Wanne-dev/Proyecto-Nen.git
+cd Proyecto-Nen
 ```
 
 2. **Configurar variables de entorno**

@@ -13,7 +13,7 @@ export default function Pagination({ page, totalPages, onChange, compact }: Prop
   const pages: number[] = [];
   const max = compact ? 5 : 7;
   let start = Math.max(1, page - Math.floor(max / 2));
-  let end = Math.min(totalPages, start + max - 1);
+  const end = Math.min(totalPages, start + max - 1);
   start = Math.max(1, end - max + 1);
   for (let i = start; i <= end; i++) pages.push(i);
 
@@ -32,7 +32,7 @@ export default function Pagination({ page, totalPages, onChange, compact }: Prop
       {start > 1 && (
         <>
           <button style={btn} onClick={() => onChange(1)}>1</button>
-          {start > 2 && <span style={{ color: C.t3, fontSize: 10 }}>…</span>}
+          {start > 2 && <span style={{ color: C.t3, fontSize: 12 }}>…</span>}
         </>
       )}
       {pages.map((p) => (
@@ -51,7 +51,7 @@ export default function Pagination({ page, totalPages, onChange, compact }: Prop
       ))}
       {end < totalPages && (
         <>
-          {end < totalPages - 1 && <span style={{ color: C.t3, fontSize: 10 }}>…</span>}
+          {end < totalPages - 1 && <span style={{ color: C.t3, fontSize: 12 }}>…</span>}
           <button style={btn} onClick={() => onChange(totalPages)}>{totalPages}</button>
         </>
       )}

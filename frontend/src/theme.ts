@@ -23,7 +23,7 @@ export const C = {
   t3: "#6B6B80",
 };
 
-export const FONT = "Inter, system-ui, -apple-system, sans-serif";
+export const FONT = "-apple-system, BlinkMacSystemFont, \"SF Pro Display\", \"SF Pro Text\", \"Segoe UI\", Inter, Roboto, \"Helvetica Neue\", Arial, sans-serif";
 
 /* ---------- Formatos ---------- */
 export function fmt(n: number, d = 2): string {
@@ -86,7 +86,7 @@ export function badgeStyle(color: string, bgColor?: string): React.CSSProperties
     borderRadius: 999,
     backgroundColor: bgColor || color + "1A",
     color,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 600,
     whiteSpace: "nowrap",
   };
@@ -97,7 +97,7 @@ export function inputStyle(overrides: React.CSSProperties = {}): React.CSSProper
   return {
     width: "100%",
     padding: "8px 10px",
-    fontSize: 12,
+    fontSize: 14,
     borderRadius: 6,
     backgroundColor: C.card,
     border: "1px solid " + C.border,

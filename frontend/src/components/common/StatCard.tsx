@@ -16,7 +16,7 @@ export default function StatCard({ label, value, sub, icon, color = C.blue, tren
   return (
     <div style={{ backgroundColor: C.card, border: "1px solid " + C.border, borderRadius: 12, padding: 14, fontFamily: FONT, minWidth: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-        <span style={{ fontSize: 10, color: C.t3, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.4 }}>{label}</span>
+        <span style={{ fontSize: 12, color: C.t3, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.4 }}>{label}</span>
         {icon && (
           <span style={{ width: 26, height: 26, borderRadius: 7, backgroundColor: color + "1A", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {icon}
@@ -28,7 +28,7 @@ export default function StatCard({ label, value, sub, icon, color = C.blue, tren
       ) : (
         <div style={{ fontSize: 19, fontWeight: 700, color: C.t1, letterSpacing: -0.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{value}</div>
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontSize: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontSize: 12 }}>
         {trend !== undefined && (
           <span style={{ fontWeight: 700, color: trend >= 0 ? C.green : C.red }}>
             {trend >= 0 ? "▲" : "▼"} {Math.abs(trend).toFixed(1)}%

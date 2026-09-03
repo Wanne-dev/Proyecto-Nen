@@ -16,12 +16,12 @@ export default function Input({ label, hint, error, prefix, suffix, style, id, .
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
       {label && (
-        <label htmlFor={inputId} style={{ fontSize: 10, color: C.t3, fontWeight: 600 }}>
+        <label htmlFor={inputId} style={{ fontSize: 12, color: C.t3, fontWeight: 600 }}>
           {label}
         </label>
       )}
       <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-        {prefix && <span style={{ position: "absolute", left: 10, color: C.t3, fontSize: 12 }}>{prefix}</span>}
+        {prefix && <span style={{ position: "absolute", left: 10, color: C.t3, fontSize: 14 }}>{prefix}</span>}
         <input
           {...rest}
           id={inputId}
@@ -30,7 +30,7 @@ export default function Input({ label, hint, error, prefix, suffix, style, id, .
             padding: "8px 10px",
             paddingLeft: prefix ? 26 : 10,
             paddingRight: suffix ? 26 : 10,
-            fontSize: 12,
+            fontSize: 14,
             borderRadius: 6,
             backgroundColor: C.card,
             border: "1px solid " + (error ? C.red : C.border),
@@ -41,12 +41,12 @@ export default function Input({ label, hint, error, prefix, suffix, style, id, .
             ...style,
           }}
         />
-        {suffix && <span style={{ position: "absolute", right: 10, color: C.t3, fontSize: 12 }}>{suffix}</span>}
+        {suffix && <span style={{ position: "absolute", right: 10, color: C.t3, fontSize: 14 }}>{suffix}</span>}
       </div>
       {error ? (
-        <span style={{ fontSize: 9, color: C.red }}>{error}</span>
+        <span style={{ fontSize: 11, color: C.red }}>{error}</span>
       ) : hint ? (
-        <span style={{ fontSize: 9, color: C.t3 }}>{hint}</span>
+        <span style={{ fontSize: 11, color: C.t3 }}>{hint}</span>
       ) : null}
     </div>
   );

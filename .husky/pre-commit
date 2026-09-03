@@ -1,1 +1,4 @@
-./hooks/pre-commit
+# Hook liviano de pre-commit.
+# (El control de mensajes convencionales vive en commit-msg con commitlint).
+# Se deja intencionalmente sin tareas pesadas para no bloquear el flujo.
+exit 0

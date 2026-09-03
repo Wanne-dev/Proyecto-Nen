@@ -1,2 +1,5 @@
-// Archivo: backend/src/middleware/cors.middleware.ts
-// Propósito: Configuración CORS
+/* CORS configurado desde el entorno â€” BANCA NEN */
+import cors from "cors";
+import { corsOptions } from "../config/cors";
+
+export const corsMiddleware = cors(corsOptions);

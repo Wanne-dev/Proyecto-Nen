@@ -43,13 +43,14 @@ export async function getPredictions(assetId?: string): Promise<Prediction[]> {
     const horizon = i % 3 === 0 ? "30d" : i % 3 === 1 ? "7d" : "24h";
     const predictedChange = clamp(chg24 * (horizon === "24h" ? 0.8 : horizon === "7d" ? 1.4 : 2.2) + (score - 50) * 0.12, -25, 35);
 
-    const features = [
+    const rawFeatures: Prediction["features"] = [
       { name: "Tendencia 24h", value: Math.abs(chg24), impact: chg24, direction: chg24 >= 0 ? 1 : -1 },
       { name: "Tendencia 7d", value: Math.abs(chg7), impact: chg7 * 0.6, direction: chg7 >= 0 ? 1 : -1 },
       { name: "Volatilidad", value: spread, impact: (score - 50) * 0.1, direction: 1 },
       { name: "Volumen relativo", value: volRatio, impact: volScore, direction: volScore >= 0 ? 1 : -1 },
       { name: "Momentum", value: Math.abs(chg24), impact: momentum, direction: momentum >= 0 ? 1 : -1 },
-    ].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
+    ];
+    const features = rawFeatures.sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
 
     return {
       asset: c.id, symbol: String(c.symbol || "").toUpperCase(), name: c.name,

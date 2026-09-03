@@ -4,7 +4,7 @@
 import { AppDataSource } from "../config/database";
 import { Order, OrderType, OrderSide, OrderStatus } from "../models/Order";
 import { WalletBalance, Currency } from "../models/WalletBalance";
-import { Transaction } from "../models/Transaction";
+import { Transaction, TransactionType, TransactionStatus } from "../models/Transaction";
 import { Wallet } from "../models/Wallet";
 import { AppError } from "../middleware/errorHandler.middleware";
 import { logAudit } from "./audit.service";
@@ -99,8 +99,9 @@ export async function createOrder(userId: string, body: {
     avgFillPrice = price;
 
     await txRepo().save(txRepo().create({
-      walletId: wallet.id, userId, type: side === OrderSide.BUY ? "trade_buy" : "trade_sell",
-      status: "completed", amount: total, currency: "USD", amountUsd: total,
+      walletId: wallet.id, userId,
+      type: side === OrderSide.BUY ? TransactionType.TRADE_BUY : TransactionType.TRADE_SELL,
+      status: TransactionStatus.COMPLETED, amount: total, currency: "USD", amountUsd: total,
       fee: commission, feeCurrency: "USD",
       description: `${side === "buy" ? "Compra" : "Venta"} ${quantity} ${symbol} a ${price} USD`,
       referenceId: "ORD-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),

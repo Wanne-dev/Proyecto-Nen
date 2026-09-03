@@ -75,12 +75,12 @@ export default function Users() {
       key: "user", header: "Usuario", sortable: true, sortValue: (u) => u.firstName,
       render: (u) => (
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-          <div style={{ width: 30, height: 30, borderRadius: "50%", backgroundColor: (u.accountStatus === "active" ? C.blue : C.border) + "33", color: u.accountStatus === "active" ? C.blue : C.t3, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, borderRadius: "50%", backgroundColor: (u.accountStatus === "active" ? C.blue : C.border) + "33", color: u.accountStatus === "active" ? C.blue : C.t3, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>
             {(u.firstName[0] + u.lastName[0]).toUpperCase()}
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.t1, whiteSpace: "nowrap" }}>{u.firstName} {u.lastName}</div>
-            <div style={{ fontSize: 9, color: C.t3 }}>{u.email}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, whiteSpace: "nowrap" }}>{u.firstName} {u.lastName}</div>
+            <div style={{ fontSize: 11, color: C.t3 }}>{u.email}</div>
           </div>
         </div>
       ),
@@ -103,19 +103,19 @@ export default function Users() {
     },
     {
       key: "country", header: "País", sortable: true, sortValue: (u) => u.country,
-      render: (u) => <span style={{ fontSize: 10, color: C.t2 }}>{u.country}</span>,
+      render: (u) => <span style={{ fontSize: 12, color: C.t2 }}>{u.country}</span>,
     },
     {
       key: "balance", header: "Balance", align: "right", sortable: true, sortValue: (u) => u.balanceUsd,
-      render: (u) => <span style={{ fontSize: 11, fontWeight: 600 }}>{fmt(u.balanceUsd)}</span>,
+      render: (u) => <span style={{ fontSize: 13, fontWeight: 600 }}>{fmt(u.balanceUsd)}</span>,
     },
     {
       key: "trades", header: "Ops", align: "right", sortable: true, sortValue: (u) => u.tradesCount,
-      render: (u) => <span style={{ fontSize: 10, color: C.t2 }}>{u.tradesCount}</span>,
+      render: (u) => <span style={{ fontSize: 12, color: C.t2 }}>{u.tradesCount}</span>,
     },
     {
       key: "lastLogin", header: "Último acceso", sortable: true, sortValue: (u) => u.lastLoginAt || "",
-      render: (u) => <span style={{ fontSize: 9, color: C.t3 }}>{u.lastLoginAt ? timeAgo(u.lastLoginAt) : "Nunca"}</span>,
+      render: (u) => <span style={{ fontSize: 11, color: C.t3 }}>{u.lastLoginAt ? timeAgo(u.lastLoginAt) : "Nunca"}</span>,
     },
     {
       key: "actions", header: "", align: "right",
@@ -127,7 +127,7 @@ export default function Users() {
           <select
             value={u.accountStatus}
             onChange={(e) => changeStatus(u, e.target.value)}
-            style={{ padding: "3px 6px", fontSize: 9, borderRadius: 5, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT, cursor: "pointer" }}
+            style={{ padding: "3px 6px", fontSize: 11, borderRadius: 5, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT, cursor: "pointer" }}
             title="Cambiar estado"
           >
             <option value="active">Activar</option>
@@ -140,7 +140,7 @@ export default function Users() {
   ];
 
   const selectSt: React.CSSProperties = {
-    padding: "6px 10px", fontSize: 11, borderRadius: 6, backgroundColor: C.card,
+    padding: "6px 10px", fontSize: 13, borderRadius: 6, backgroundColor: C.card,
     border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT, cursor: "pointer",
   };
 
@@ -171,7 +171,7 @@ export default function Users() {
             <option value="suspended">Suspendidos</option>
           </select>
           <div style={{ flex: 1 }} />
-          <span style={{ fontSize: 10, color: C.t3 }}>{users.length} usuarios</span>
+          <span style={{ fontSize: 12, color: C.t3 }}>{users.length} usuarios</span>
         </div>
 
         {loading ? (
@@ -192,8 +192,8 @@ export default function Users() {
                 {(selected.firstName[0] + selected.lastName[0]).toUpperCase()}
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: C.t1 }}>{selected.firstName} {selected.lastName}</div>
-                <div style={{ fontSize: 10, color: C.t3 }}>{selected.email}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.t1 }}>{selected.firstName} {selected.lastName}</div>
+                <div style={{ fontSize: 12, color: C.t3 }}>{selected.email}</div>
                 <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
                   <Badge tone={ROLE_TONE[selected.role]}>{ROLE_LABELS[selected.role]}</Badge>
                   <Badge tone={STATUS_TONE[selected.accountStatus]}>{selected.accountStatus.toUpperCase()}</Badge>
@@ -211,18 +211,18 @@ export default function Users() {
                 { label: "2FA", value: selected.twoFactorEnabled ? "Activado" : "Inactivo" },
               ].map((x) => (
                 <div key={x.label} style={{ padding: "8px 10px", borderRadius: 7, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                  <div style={{ fontSize: 9, color: C.t3 }}>{x.label}</div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: C.t1, marginTop: 2 }}>{x.value}</div>
+                  <div style={{ fontSize: 11, color: C.t3 }}>{x.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.t1, marginTop: 2 }}>{x.value}</div>
                 </div>
               ))}
             </div>
 
             <div>
-              <label style={{ fontSize: 10, color: C.t3, display: "block", marginBottom: 5 }}>Cambiar rol</label>
+              <label style={{ fontSize: 12, color: C.t3, display: "block", marginBottom: 5 }}>Cambiar rol</label>
               <select
                 value={selected.role}
                 onChange={(e) => changeRole(selected, e.target.value)}
-                style={{ width: "100%", padding: "8px 10px", fontSize: 12, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}
+                style={{ width: "100%", padding: "8px 10px", fontSize: 14, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}
               >
                 <option value="user">Usuario</option>
                 <option value="analyst">Analista</option>
@@ -248,7 +248,7 @@ export default function Users() {
               </Button>
             </div>
 
-            <div style={{ fontSize: 9, color: C.t3, display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ fontSize: 11, color: C.t3, display: "flex", alignItems: "center", gap: 5 }}>
               <UserCog size={11} /> Las acciones quedan registradas en la auditoría inmutable.
             </div>
           </div>

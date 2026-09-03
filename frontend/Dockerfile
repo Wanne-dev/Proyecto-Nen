@@ -11,12 +11,10 @@ RUN npm install
 
 COPY . .
 
-# El script del proyecto es "tsc --noEmit && vite build", pero el chequeo de
-# tipos falla por tipado suelto preexistente. Vite transpila sin comprobar
-# tipos, asi que el bundle sale correcto igualmente.
-RUN npx vite build
+# Typecheck + build de producción (vite build). Fallará si hay errores.
+RUN npm run build
 
-# Si no hay index.html la imagen serviria una pagina en blanco: mejor fallar aqui.
+# Si no hay index.html la imagen serviría una página en blanco: mejor fallar aquí.
 RUN test -f dist/index.html || (echo "ERROR: vite build no genero dist/index.html" && exit 1)
 
 # ---------- STAGE 2: serve ----------

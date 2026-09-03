@@ -52,57 +52,57 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: "varchar", unique: true, length: 255 })
   @Index()
   email: string;
 
-  @Column({ name: "password_hash", length: 255 })
+  @Column({ type: "varchar", name: "password_hash", length: 255 })
   passwordHash: string;
 
-  @Column({ name: "first_name", length: 100 })
+  @Column({ type: "varchar", name: "first_name", length: 100 })
   firstName: string;
 
-  @Column({ name: "last_name", length: 100 })
+  @Column({ type: "varchar", name: "last_name", length: 100 })
   lastName: string;
 
   @Column({ name: "document_type", type: "enum", enum: DocumentType, default: DocumentType.CC })
   documentType: DocumentType;
 
-  @Column({ name: "document_number", unique: true, nullable: true, length: 50 })
-  documentNumber: string;
+  @Column({ type: "varchar", name: "document_number", unique: true, nullable: true, length: 50 })
+  documentNumber: string | null;
 
   @Column({ name: "date_of_birth", type: "date", nullable: true })
-  dateOfBirth: Date;
+  dateOfBirth: Date | null;
 
-  @Column({ nullable: true, length: 20 })
-  phone: string;
+  @Column({ type: "varchar", nullable: true, length: 20 })
+  phone: string | null;
 
-  @Column({ name: "email_verified", default: false })
+  @Column({ type: "boolean", name: "email_verified", default: false })
   emailVerified: boolean;
 
-  @Column({ name: "phone_verified", default: false })
+  @Column({ type: "boolean", name: "phone_verified", default: false })
   phoneVerified: boolean;
 
-  @Column({ name: "is_verified", default: false })
+  @Column({ type: "boolean", name: "is_verified", default: false })
   isVerified: boolean;
 
-  @Column({ name: "two_factor_secret", nullable: true, length: 255 })
-  twoFactorSecret: string;
+  @Column({ type: "varchar", name: "two_factor_secret", nullable: true, length: 255 })
+  twoFactorSecret: string | null;
 
-  @Column({ name: "two_factor_enabled", default: false })
+  @Column({ type: "boolean", name: "two_factor_enabled", default: false })
   twoFactorEnabled: boolean;
 
-  @Column({ name: "failed_login_attempts", default: 0 })
+  @Column({ type: "integer", name: "failed_login_attempts", default: 0 })
   failedLoginAttempts: number;
 
   @Column({ name: "locked_until", type: "timestamptz", nullable: true })
-  lockedUntil: Date;
+  lockedUntil: Date | null;
 
-  @Column({ name: "reset_password_token", nullable: true, length: 255 })
-  resetPasswordToken: string;
+  @Column({ type: "varchar", name: "reset_password_token", nullable: true, length: 255 })
+  resetPasswordToken: string | null;
 
   @Column({ name: "reset_password_expires", type: "timestamptz", nullable: true })
-  resetPasswordExpires: Date;
+  resetPasswordExpires: Date | null;
 
   @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
   role: UserRole;
@@ -114,18 +114,18 @@ export class User {
   accountStatus: AccountStatus;
 
   @Column({ name: "last_login_at", type: "timestamptz", nullable: true })
-  lastLoginAt: Date;
+  lastLoginAt: Date | null;
 
-  @Column({ name: "last_login_ip", nullable: true, length: 45 })
-  lastLoginIp: string;
+  @Column({ type: "varchar", name: "last_login_ip", nullable: true, length: 45 })
+  lastLoginIp: string | null;
 
-  @Column({ name: "country", default: "CO", length: 3 })
+  @Column({ type: "varchar", name: "country", default: "CO", length: 3 })
   country: string;
 
-  @Column({ name: "timezone", default: "America/Bogota", length: 50 })
+  @Column({ type: "varchar", name: "timezone", default: "America/Bogota", length: 50 })
   timezone: string;
 
-  @Column({ name: "preferred_currency", default: "COP", length: 3 })
+  @Column({ type: "varchar", name: "preferred_currency", default: "COP", length: 3 })
   preferredCurrency: string;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })

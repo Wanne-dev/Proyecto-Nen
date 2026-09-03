@@ -48,8 +48,8 @@ export default function Modal({ open, onClose, title, subtitle, children, footer
         {(title || subtitle) && (
           <div style={{ padding: "14px 18px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div>
-              {title && <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{title}</div>}
-              {subtitle && <div style={{ fontSize: 10, color: C.t3, marginTop: 2 }}>{subtitle}</div>}
+              {title && <div style={{ fontSize: 16, fontWeight: 700, color: C.t1 }}>{title}</div>}
+              {subtitle && <div style={{ fontSize: 12, color: C.t3, marginTop: 2 }}>{subtitle}</div>}
             </div>
             <button
               onClick={onClose}

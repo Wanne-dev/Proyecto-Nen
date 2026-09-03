@@ -1,18 +1,68 @@
-name: Docker Image CI
+# ──────────────────────────────────────────────────────────────
+# BANCA NEN — CI
+# 1) Instala dependencias con pnpm y corre typecheck + tests + lint + build.
+# 2) Construye las imágenes Docker de backend, frontend e IA.
+# ──────────────────────────────────────────────────────────────
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main", "develop"]
 
 jobs:
-
-  build:
-
+  test:
+    name: Typecheck + tests + build
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Backend — typecheck
+        run: pnpm --filter banca-nen-backend typecheck
+
+      - name: Backend — tests
+        run: pnpm --filter banca-nen-backend test
+
+      - name: Backend — build
+        run: pnpm --filter banca-nen-backend build
+
+      - name: Frontend — typecheck
+        run: pnpm --filter banca-nen-frontend typecheck
+
+      - name: Frontend — tests
+        run: pnpm --filter banca-nen-frontend test
+
+      - name: Frontend — lint
+        run: pnpm --filter banca-nen-frontend lint
+
+      - name: Frontend — build
+        run: pnpm --filter banca-nen-frontend build
+
+  docker:
+    name: Build de imágenes Docker
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Backend
+        run: docker build -t banca-nen-backend ./backend
+
+      - name: Frontend
+        run: docker build -t banca-nen-frontend ./frontend
+
+      - name: IA Service
+        run: docker build -t banca-nen-ia ./ia-service

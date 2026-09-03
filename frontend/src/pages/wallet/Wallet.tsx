@@ -27,8 +27,8 @@ class ErrorBoundary extends Component<{ children: ReactNode }, EBState> {
         <div style={{ backgroundColor: "#0A0A0F", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "Inter, sans-serif", gap: 12, padding: 32 }}>
           <AlertCircle size={48} color="#FF3355" />
           <h2 style={{ fontSize: 18, fontWeight: 700 }}>Error en Wallet</h2>
-          <p style={{ fontSize: 12, color: "#A0A0B8", maxWidth: 400, textAlign: "center" }}>{this.state.error}</p>
-          <button onClick={() => { this.setState({ hasError: false, error: "" }); window.location.reload(); }} style={{ padding: "8px 24px", fontSize: 13, fontWeight: 700, backgroundColor: "#F59E0B", color: "#0A0A0F", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>
+          <p style={{ fontSize: 14, color: "#A0A0B8", maxWidth: 400, textAlign: "center" }}>{this.state.error}</p>
+          <button onClick={() => { this.setState({ hasError: false, error: "" }); window.location.reload(); }} style={{ padding: "8px 24px", fontSize: 15, fontWeight: 700, backgroundColor: "#F59E0B", color: "#0A0A0F", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>
             Recargar
           </button>
         </div>
@@ -222,7 +222,7 @@ export default function WalletPage() {
   };
 
   const inputStyle = {
-    width: "100%", padding: "8px 10px", fontSize: 12, borderRadius: 6,
+    width: "100%", padding: "8px 10px", fontSize: 14, borderRadius: 6,
     backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1,
     outline: "none", fontFamily: "Inter, sans-serif" as const,
   };
@@ -246,17 +246,17 @@ export default function WalletPage() {
                 {/* ===== HEADER: Total + Botones ===== */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                   <div>
-                    <div style={{ fontSize: 11, color: C.t3, marginBottom: 4 }}>Balance Total (Fiat)</div>
+                    <div style={{ fontSize: 13, color: C.t3, marginBottom: 4 }}>Balance Total (Fiat)</div>
                     <div style={{ fontSize: 28, fontWeight: 700 }}>${totalFiat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={() => openModal("deposit", "USD")} style={{ padding: "8px 20px", fontSize: 12, fontWeight: 700, backgroundColor: C.green, color: C.bg, border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                    <button onClick={() => openModal("deposit", "USD")} style={{ padding: "8px 20px", fontSize: 14, fontWeight: 700, backgroundColor: C.green, color: C.bg, border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                       <Plus size={14} /> Depositar
                     </button>
-                    <button onClick={() => openModal("withdraw", "USD")} style={{ padding: "8px 20px", fontSize: 12, fontWeight: 700, backgroundColor: C.red, color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+                    <button onClick={() => openModal("withdraw", "USD")} style={{ padding: "8px 20px", fontSize: 14, fontWeight: 700, backgroundColor: C.red, color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
                       <Minus size={14} /> Retirar
                     </button>
-                    <button onClick={loadAll} style={{ padding: "8px 12px", fontSize: 12, backgroundColor: C.card, color: C.t2, border: "1px solid " + C.border, borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>
+                    <button onClick={loadAll} style={{ padding: "8px 12px", fontSize: 14, backgroundColor: C.card, color: C.t2, border: "1px solid " + C.border, borderRadius: 6, cursor: "pointer", fontFamily: "Inter, sans-serif" }}>
                       <RefreshCw size={14} />
                     </button>
                   </div>
@@ -271,12 +271,12 @@ export default function WalletPage() {
                       <div key={cur} style={{ backgroundColor: C.card, borderRadius: 8, border: "1px solid " + C.border, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: meta.color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: meta.color }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: meta.color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: meta.color }}>
                               {meta.icon}
                             </div>
                             <div>
-                              <div style={{ fontSize: 12, fontWeight: 600 }}>{cur}</div>
-                              <div style={{ fontSize: 9, color: C.t3 }}>{meta.name}</div>
+                              <div style={{ fontSize: 14, fontWeight: 600 }}>{cur}</div>
+                              <div style={{ fontSize: 11, color: C.t3 }}>{meta.name}</div>
                             </div>
                           </div>
                         </div>
@@ -284,10 +284,10 @@ export default function WalletPage() {
                           {fmtCurrency(bal, cur)}
                         </div>
                         <div style={{ display: "flex", gap: 6 }}>
-                          <button onClick={() => openModal("deposit", cur)} style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 600, backgroundColor: C.greenBg, color: C.green, border: "1px solid " + C.green + "40", borderRadius: 4, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>
+                          <button onClick={() => openModal("deposit", cur)} style={{ flex: 1, padding: "4px 0", fontSize: 12, fontWeight: 600, backgroundColor: C.greenBg, color: C.green, border: "1px solid " + C.green + "40", borderRadius: 4, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>
                             <Plus size={10} /> Dep
                           </button>
-                          <button onClick={() => openModal("withdraw", cur)} style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 600, backgroundColor: C.redBg, color: C.red, border: "1px solid " + C.red + "40", borderRadius: 4, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>
+                          <button onClick={() => openModal("withdraw", cur)} style={{ flex: 1, padding: "4px 0", fontSize: 12, fontWeight: 600, backgroundColor: C.redBg, color: C.red, border: "1px solid " + C.red + "40", borderRadius: 4, cursor: "pointer", fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>
                             <Minus size={10} /> Ret
                           </button>
                         </div>
@@ -301,18 +301,18 @@ export default function WalletPage() {
                   <div style={{ padding: "12px 16px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <Clock size={14} color={C.gold} />
-                      <span style={{ fontSize: 13, fontWeight: 600 }}>Transacciones Recientes</span>
+                      <span style={{ fontSize: 15, fontWeight: 600 }}>Transacciones Recientes</span>
                     </div>
-                    <span style={{ fontSize: 10, color: C.t3 }}>{transactions.length} registros</span>
+                    <span style={{ fontSize: 12, color: C.t3 }}>{transactions.length} registros</span>
                   </div>
 
                   {transactions.length === 0 ? (
-                    <div style={{ padding: 32, textAlign: "center", color: C.t3, fontSize: 12 }}>
+                    <div style={{ padding: 32, textAlign: "center", color: C.t3, fontSize: 14 }}>
                       No hay transacciones aun
                     </div>
                   ) : (
                     <div style={{ overflowX: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                         <thead>
                           <tr style={{ backgroundColor: C.bg2 }}>
                             <th style={{ padding: "8px 12px", textAlign: "left", color: C.t3, fontWeight: 600 }}>Tipo</th>
@@ -337,7 +337,7 @@ export default function WalletPage() {
                                   </div>
                                 </td>
                                 <td style={{ padding: "8px 12px" }}>
-                                  <span style={{ padding: "2px 6px", borderRadius: 3, backgroundColor: (CURRENCY_META[tx.currency]?.color || C.t3) + "20", color: CURRENCY_META[tx.currency]?.color || C.t3, fontSize: 10, fontWeight: 600 }}>
+                                  <span style={{ padding: "2px 6px", borderRadius: 3, backgroundColor: (CURRENCY_META[tx.currency]?.color || C.t3) + "20", color: CURRENCY_META[tx.currency]?.color || C.t3, fontSize: 12, fontWeight: 600 }}>
                                     {tx.currency}
                                   </span>
                                 </td>
@@ -345,7 +345,7 @@ export default function WalletPage() {
                                   {isPositive ? "+" : "-"}{fmtCurrency(Math.abs(tx.amount), tx.currency)}
                                 </td>
                                 <td style={{ padding: "8px 12px" }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 4, color: sMeta.color, fontSize: 10 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 4, color: sMeta.color, fontSize: 12 }}>
                                     <SIcon size={10} />
                                     <span>{sMeta.label}</span>
                                   </div>
@@ -353,7 +353,7 @@ export default function WalletPage() {
                                 <td style={{ padding: "8px 12px", color: C.t2, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                   {tx.description || "-"}
                                 </td>
-                                <td style={{ padding: "8px 12px", textAlign: "right", color: C.t3, fontSize: 10 }}>
+                                <td style={{ padding: "8px 12px", textAlign: "right", color: C.t3, fontSize: 12 }}>
                                   {tx.createdAt ? fmtDate(tx.createdAt) : "-"}
                                 </td>
                               </tr>
@@ -377,7 +377,7 @@ export default function WalletPage() {
               <div style={{ padding: "16px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   {modalMode === "deposit" ? <Plus size={16} color={C.green} /> : <Minus size={16} color={C.red} />}
-                  <span style={{ fontSize: 14, fontWeight: 700 }}>{modalMode === "deposit" ? "Depositar" : "Retirar"}</span>
+                  <span style={{ fontSize: 16, fontWeight: 700 }}>{modalMode === "deposit" ? "Depositar" : "Retirar"}</span>
                 </div>
                 <button onClick={() => setModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.t3, fontSize: 18, fontFamily: "Inter, sans-serif" }}>&times;</button>
               </div>
@@ -386,7 +386,7 @@ export default function WalletPage() {
               <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
                 {/* Moneda */}
                 <div>
-                  <label style={{ fontSize: 10, color: C.t3, display: "block", marginBottom: 4 }}>Moneda</label>
+                  <label style={{ fontSize: 12, color: C.t3, display: "block", marginBottom: 4 }}>Moneda</label>
                   <select value={modalCurrency} onChange={e => setModalCurrency(e.target.value)} style={{ ...inputStyle, cursor: "pointer" }}>
                     {Object.entries(CURRENCY_META).map(([cur, meta]) => (
                       <option key={cur} value={cur}>{cur} - {meta.name}</option>
@@ -396,10 +396,10 @@ export default function WalletPage() {
 
                 {/* Monto */}
                 <div>
-                  <label style={{ fontSize: 10, color: C.t3, display: "block", marginBottom: 4 }}>Monto</label>
+                  <label style={{ fontSize: 12, color: C.t3, display: "block", marginBottom: 4 }}>Monto</label>
                   <input type="number" value={modalAmount} onChange={e => setModalAmount(e.target.value)} placeholder="0.00" min="0" step="any" style={inputStyle} />
                   {modalMode === "withdraw" && (
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 9 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 11 }}>
                       <span style={{ color: C.t3 }}>Disponible:</span>
                       <span style={{ color: C.t2, fontWeight: 600 }}>{fmtCurrency(getBalance(modalCurrency), modalCurrency)}</span>
                     </div>
@@ -408,13 +408,13 @@ export default function WalletPage() {
 
                 {/* Descripcion */}
                 <div>
-                  <label style={{ fontSize: 10, color: C.t3, display: "block", marginBottom: 4 }}>Descripcion (opcional)</label>
+                  <label style={{ fontSize: 12, color: C.t3, display: "block", marginBottom: 4 }}>Descripcion (opcional)</label>
                   <input value={modalDesc} onChange={e => setModalDesc(e.target.value)} placeholder={modalMode === "deposit" ? "Deposito " + modalCurrency : "Retiro " + modalCurrency} style={inputStyle} />
                 </div>
 
                 {/* Error */}
                 {modalError && (
-                  <div style={{ padding: "6px 10px", borderRadius: 4, backgroundColor: C.redBg, border: "1px solid " + C.red + "40", color: C.red, fontSize: 11, display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ padding: "6px 10px", borderRadius: 4, backgroundColor: C.redBg, border: "1px solid " + C.red + "40", color: C.red, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
                     <AlertCircle size={12} />
                     {modalError}
                   </div>
@@ -422,7 +422,7 @@ export default function WalletPage() {
 
                 {/* Preview */}
                 {parseFloat(modalAmount) > 0 && (
-                  <div style={{ padding: 10, borderRadius: 6, backgroundColor: C.card, display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                  <div style={{ padding: 10, borderRadius: 6, backgroundColor: C.card, display: "flex", justifyContent: "space-between", fontSize: 14 }}>
                     <span style={{ color: C.t2 }}>Total</span>
                     <span style={{ fontWeight: 700, color: modalMode === "deposit" ? C.green : C.red }}>
                       {modalMode === "deposit" ? "+" : "-"}{fmtCurrency(parseFloat(modalAmount), modalCurrency)}
@@ -435,7 +435,7 @@ export default function WalletPage() {
                   onClick={execModal}
                   disabled={modalSubmitting}
                   style={{
-                    width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", cursor: modalSubmitting ? "wait" : "pointer", borderRadius: 6, fontFamily: "Inter, sans-serif",
+                    width: "100%", padding: "10px 0", fontSize: 15, fontWeight: 700, border: "none", cursor: modalSubmitting ? "wait" : "pointer", borderRadius: 6, fontFamily: "Inter, sans-serif",
                     backgroundColor: modalMode === "deposit" ? C.green : C.red,
                     color: modalMode === "deposit" ? C.bg : "#fff",
                     opacity: modalSubmitting ? 0.7 : 1,

@@ -1,0 +1,13 @@
+# ─────────────────────────────────────────────────────────────
+# BANCA NEN — IA Service (dependencias de ENTRENAMIENTO)
+# Entorno para entrenar el ensemble (LSTM + Random Forest + XGBoost)
+# y generar explicabilidad (SHAP/LIME). NO va en la imagen de producción.
+#
+#   pip install -r requirements-ml.txt
+# ─────────────────────────────────────────────────────────────
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.4.2
+xgboost==2.0.3
+shap==0.45.1
+joblib==1.4.0

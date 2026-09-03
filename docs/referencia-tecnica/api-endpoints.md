@@ -1,4 +1,4 @@
-﻿# API Endpoints — BANCA NEN (FinPredictor Pro)
+# API Endpoints — BANCA NEN (FinPredictor Pro)
 
 ## Información General
 
@@ -9,6 +9,9 @@
 | Formato de datos | `application/json` |
 | Autenticación | `Authorization: Bearer <token>` (JWT) |
 | Rate limiting | 5 req / 15 min en auth, 10 req / min en market |
+
+> **Documentación interactiva.** El backend expone Swagger UI en
+> `GET /api/v1/docs` y la especificación OpenAPI en `GET /api/v1/docs-json`.
 
 > **Envelope de respuesta.** Todas las respuestas viajan envueltas en `{ success, ... }`:
 > - Éxito con datos: `{ "success": true, "data": T }`
@@ -46,6 +49,14 @@
 | GET | `/api/market/overview` | No | Resumen del mercado |
 | POST | `/api/orders` | Sí | Crear orden de trading |
 | GET | `/api/orders` | Sí | Listar órdenes |
+| GET | `/api/v1/user/me` | Sí | Perfil del usuario autenticado |
+| PATCH | `/api/v1/user/me` | Sí | Actualizar perfil |
+| GET | `/api/v1/user/settings` | Sí | Preferencias del usuario |
+| PATCH | `/api/v1/user/settings` | Sí | Actualizar preferencias |
+| GET | `/api/v1/transactions` | Sí | Historial de transacciones paginado |
+| GET | `/api/v1/transactions/summary` | Sí | Resumen del periodo (depósitos/retiros) |
+| GET | `/api/v1/transactions/:id` | Sí | Detalle de una transacción |
+| POST | `/api/v1/webhooks/wompi` | No* | Eventos de Wompi (validados por firma) |
 | GET | `/api/orders/:id` | Sí | Detalle de orden |
 | DELETE | `/api/orders/:id` | Sí | Cancelar orden |
 | GET | `/api/notifications` | Sí | Listar notificaciones |

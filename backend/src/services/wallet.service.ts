@@ -1,7 +1,7 @@
 import { AppDataSource } from "../config/database";
 import { Wallet, WalletType } from "../models/Wallet";
 import { WalletBalance, Currency } from "../models/WalletBalance";
-import { Transaction } from "../models/Transaction";
+import { Transaction, TransactionType, TransactionStatus } from "../models/Transaction";
 import { User } from "../models/User";
 import { Between, FindOptionsWhere } from "typeorm";
 import { getPrice } from "./market-client";
@@ -63,7 +63,7 @@ export async function deposit(userId: string, currency: string, amount: number, 
   await balanceRepo().save(balance);
   const refId = "DEP-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
   const tx = txRepo().create({
-    walletId, userId, type: "deposit" as any, status: "completed" as any,
+    walletId, userId, type: TransactionType.DEPOSIT, status: TransactionStatus.COMPLETED,
     amount, currency: curr, amountUsd: Math.round(amount * usdRate * 100) / 100,
     fee: 0, feeCurrency: "USD", description: description || "Deposito",
     referenceId: refId,
@@ -85,7 +85,7 @@ export async function withdraw(userId: string, currency: string, amount: number,
   await balanceRepo().save(balance);
   const refId = "WTH-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
   const tx = txRepo().create({
-    walletId, userId, type: "withdrawal" as any, status: "completed" as any,
+    walletId, userId, type: TransactionType.WITHDRAWAL, status: TransactionStatus.COMPLETED,
     amount, currency: curr, amountUsd: curr === Currency.USD ? amount : 0,
     fee: amount * 0.001, feeCurrency: "USD", description: description || "Retiro",
     referenceId: refId,

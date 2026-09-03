@@ -33,13 +33,13 @@ export default function PerformanceChart({
         {showGrid && <CartesianGrid stroke={C.border + "55"} strokeDasharray="3 3" vertical={false} />}
         <XAxis
           dataKey="date"
-          tick={{ fill: C.t3, fontSize: 9, fontFamily: FONT }}
+          tick={{ fill: C.t3, fontSize: 11, fontFamily: FONT }}
           axisLine={{ stroke: C.border }}
           tickLine={false}
           minTickGap={40}
         />
         <YAxis
-          tick={{ fill: C.t3, fontSize: 9, fontFamily: FONT }}
+          tick={{ fill: C.t3, fontSize: 11, fontFamily: FONT }}
           axisLine={false}
           tickLine={false}
           width={54}
@@ -49,9 +49,9 @@ export default function PerformanceChart({
         <Tooltip
           contentStyle={{
             backgroundColor: C.bg2, border: "1px solid " + C.border, borderRadius: 8,
-            fontFamily: FONT, fontSize: 11, color: C.t1,
+            fontFamily: FONT, fontSize: 13, color: C.t1,
           }}
-          labelStyle={{ color: C.t3, fontSize: 10 }}
+          labelStyle={{ color: C.t3, fontSize: 12 }}
           formatter={(value: any) => [(formatValue ? formatValue(value) : "$" + Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })), ""]}
         />
         <Area

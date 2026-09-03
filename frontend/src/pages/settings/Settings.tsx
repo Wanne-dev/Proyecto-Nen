@@ -77,8 +77,8 @@ export default function Settings() {
                 </button>
               </div>
               <div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.t1 }}>{user?.firstName} {user?.lastName}</div>
-                <div style={{ fontSize: 10, color: C.t3 }}>{user?.email} · Miembro desde 2026</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: C.t1 }}>{user?.firstName} {user?.lastName}</div>
+                <div style={{ fontSize: 12, color: C.t3 }}>{user?.email} · Miembro desde 2026</div>
                 <div style={{ marginTop: 5, display: "flex", gap: 6 }}>
                   <Badge tone={user?.kycStatus === "verified" ? "green" : "gold"} icon={<BadgeCheck size={9} />}>KYC {user?.kycStatus?.toUpperCase() || "PENDING"}</Badge>
                   <Badge tone="blue" icon={<ShieldCheck size={9} />}>2FA {user?.twoFactorEnabled ? "activo" : "inactivo"}</Badge>
@@ -119,8 +119,8 @@ export default function Settings() {
                   <div key={item.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < 4 ? "1px solid " + C.border : "none" }}>
                     {item.icon}
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: C.t1 }}>{item.label}</div>
-                      <div style={{ fontSize: 9, color: C.t3 }}>{item.desc}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: C.t1 }}>{item.label}</div>
+                      <div style={{ fontSize: 11, color: C.t3 }}>{item.desc}</div>
                     </div>
                     <Toggle checked={prefs[key]} onChange={(v) => setPrefs({ ...prefs, [key]: v })} />
                   </div>
@@ -139,18 +139,18 @@ export default function Settings() {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {KYC_LEVELS.map((k) => (
                 <div key={k.level} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 8, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                  <span style={{ width: 24, height: 24, borderRadius: "50%", backgroundColor: k.done ? C.green : C.border, color: k.done ? "#0A0A0F" : C.t3, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800 }}>
+                  <span style={{ width: 24, height: 24, borderRadius: "50%", backgroundColor: k.done ? C.green : C.border, color: k.done ? "#0A0A0F" : C.t3, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800 }}>
                     {k.done ? "✓" : k.level}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: C.t1 }}>{k.label}</div>
-                    <div style={{ fontSize: 9, color: C.t3 }}>{k.desc}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{k.label}</div>
+                    <div style={{ fontSize: 11, color: C.t3 }}>{k.desc}</div>
                   </div>
                   {k.done && <Badge tone="green">Completado</Badge>}
                 </div>
               ))}
             </div>
-            <div style={{ marginTop: 10, fontSize: 9, color: C.t3, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 10, fontSize: 11, color: C.t3, lineHeight: 1.5 }}>
               Cumplimiento SARLAFT: tu documentación KYC está cifrada con AES-256-GCM y auditada.
             </div>
           </Card>
@@ -159,14 +159,14 @@ export default function Settings() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Languages size={14} color={C.t2} />
-                <select style={{ flex: 1, padding: "8px 10px", fontSize: 11, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}>
+                <select style={{ flex: 1, padding: "8px 10px", fontSize: 13, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}>
                   <option>Español (Latinoamérica)</option>
                   <option>English (US)</option>
                 </select>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Globe size={14} color={C.t2} />
-                <select style={{ flex: 1, padding: "8px 10px", fontSize: 11, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}>
+                <select style={{ flex: 1, padding: "8px 10px", fontSize: 13, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}>
                   <option>America/Bogota (UTC-5)</option>
                   <option>America/Mexico_City (UTC-6)</option>
                   <option>Europe/Madrid (UTC+2)</option>
@@ -197,6 +197,6 @@ export default function Settings() {
 
 const linkRow: React.CSSProperties = {
   display: "flex", alignItems: "center", width: "100%", padding: "12px 14px",
-  background: "none", border: "none", cursor: "pointer", color: C.t1, fontSize: 12,
+  background: "none", border: "none", cursor: "pointer", color: C.t1, fontSize: 14,
   textAlign: "left", fontFamily: FONT,
 };

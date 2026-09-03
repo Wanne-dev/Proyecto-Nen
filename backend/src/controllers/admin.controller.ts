@@ -1,6 +1,15 @@
 /* Controladores de Administración — BANCA NEN */
 import { Request, Response, NextFunction } from "express";
-import { getUsers, changeStatus, changeRole, getAudit, getStats, getChart, getSettings, saveSettings } from "../services/admin.service";
+import {
+  getUsers,
+  changeStatus,
+  changeRole,
+  getAudit,
+  getStats as getStatsService,
+  getChart as getChartService,
+  getSettings as getSettingsService,
+  saveSettings as saveSettingsService,
+} from "../services/admin.service";
 
 export async function listUsers(req: Request, res: Response, next: NextFunction) {
   try {
@@ -36,26 +45,26 @@ export async function listAuditLogs(req: Request, res: Response, next: NextFunct
 
 export async function getStats(_req: Request, res: Response, next: NextFunction) {
   try {
-    res.json({ success: true, data: await getStats() });
+    res.json({ success: true, data: await getStatsService() });
   } catch (err) { next(err); }
 }
 
 export async function getChartData(req: Request, res: Response, next: NextFunction) {
   try {
     const range = (req.query.range as any) || "30d";
-    res.json({ success: true, data: await getChart(range) });
+    res.json({ success: true, data: await getChartService(range) });
   } catch (err) { next(err); }
 }
 
 export async function getSettings(_req: Request, res: Response, next: NextFunction) {
   try {
-    res.json({ success: true, data: await getSettings() });
+    res.json({ success: true, data: await getSettingsService() });
   } catch (err) { next(err); }
 }
 
 export async function saveSettings(req: Request, res: Response, next: NextFunction) {
   try {
     const adminId = (req as any).user.id;
-    res.json({ success: true, data: await saveSettings(adminId, req.body) });
+    res.json({ success: true, data: await saveSettingsService(adminId, req.body) });
   } catch (err) { next(err); }
 }

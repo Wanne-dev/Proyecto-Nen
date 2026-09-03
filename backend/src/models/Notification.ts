@@ -29,25 +29,25 @@ export class Notification {
   @Column({ type: "enum", enum: NotificationType })
   type: NotificationType;
 
-  @Column({ length: 255 })
+  @Column({ type: "varchar", length: 255 })
   title: string;
 
   @Column({ type: "text" })
   message: string;
 
-  @Column({ default: false })
+  @Column({ type: "boolean", default: false })
   read: boolean;
 
   @Column({ name: "read_at", type: "timestamptz", nullable: true })
-  readAt: Date;
+  readAt: Date | null;
 
-  @Column({ name: "action_url", nullable: true, length: 500 })
-  actionUrl: string;
+  @Column({ type: "varchar", name: "action_url", nullable: true, length: 500 })
+  actionUrl: string | null;
 
   @Column({ name: "metadata", type: "jsonb", nullable: true })
-  metadata: object;
+  metadata: object | null;
 
-  @Column({ name: "priority", default: "normal", length: 20 })
+  @Column({ type: "varchar", name: "priority", default: "normal", length: 20 })
   priority: string;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })

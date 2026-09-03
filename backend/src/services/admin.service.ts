@@ -6,7 +6,6 @@ import { User, UserRole, AccountStatus } from "../models/User";
 import { Order, OrderStatus } from "../models/Order";
 import { Transaction, TransactionType } from "../models/Transaction";
 import { Wallet } from "../models/Wallet";
-import { Notification } from "../models/Notification";
 import { SystemSetting } from "../models/SystemSetting";
 import { listAudit, logAudit } from "./audit.service";
 import { AuditAction } from "../models/AuditLog";
@@ -16,7 +15,6 @@ const userRepo = () => AppDataSource.getRepository(User);
 const orderRepo = () => AppDataSource.getRepository(Order);
 const txRepo = () => AppDataSource.getRepository(Transaction);
 const walletRepo = () => AppDataSource.getRepository(Wallet);
-const notifRepo = () => AppDataSource.getRepository(Notification);
 const settingsRepo = () => AppDataSource.getRepository(SystemSetting);
 
 const DEFAULT_SETTINGS = {
@@ -198,23 +196,12 @@ export async function saveSettings(adminId: string, patch: any) {
 }
 
 /* ---- Notificaciones ---- */
-export async function listUserNotifications(userId: string, limit = 30) {
-  return notifRepo().find({ where: { userId } as any, order: { createdAt: "DESC" }, take: limit });
-}
-
-export async function createNotification(userId: string, type: string, title: string, message: string, priority = "normal") {
-  return notifRepo().save(notifRepo().create({ userId, type: type as any, title, message, priority }));
-}
-
-export async function markRead(userId: string, id: string) {
-  const n = await notifRepo().findOne({ where: { id, userId } as any });
-  if (!n) throw new AppError("Notificacion no encontrada", 404);
-  n.read = true;
-  n.readAt = new Date();
-  return notifRepo().save(n);
-}
-
-export async function markAllRead(userId: string) {
-  await notifRepo().update({ userId } as any, { read: true, readAt: new Date() } as any);
-  return { success: true };
-}
+/* La lógica de notificaciones vive en notification.service; se re-exporta
+   aquí para no romper los imports existentes (wallet.service, etc.). */
+export {
+  listUserNotifications,
+  createNotification,
+  markRead,
+  markAllRead,
+  unreadCount,
+} from "./notification.service";

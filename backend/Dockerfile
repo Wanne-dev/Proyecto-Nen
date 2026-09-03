@@ -12,15 +12,11 @@ RUN npm install
 COPY tsconfig.json ./
 COPY src ./src
 
-# El proyecto tiene errores de tipos preexistentes en modulos no criticos
-# (admin, orders, reports, ia). Con "noEmitOnError false" TypeScript emite el
-# JavaScript igualmente. El "|| true" evita que el build se detenga.
-RUN npx tsc --noEmitOnError false || true
+# Compila el backend (TypeScript -> dist). Fallará si hay errores de tipos.
+RUN npm run build
 
-# Verificacion REAL: si dist/app.js no existe, la imagen seria inservible y
-# el contenedor moriria al arrancar. Preferimos fallar aqui con un mensaje claro.
+# Verificación: si dist/app.js no existe, la imagen sería inservible.
 RUN test -f dist/app.js || (echo "ERROR: la compilacion no genero dist/app.js" && exit 1)
-RUN test -f dist/config/email.js || (echo "ERROR: falta dist/config/email.js" && exit 1)
 
 # ---------- STAGE 2: runtime ----------
 FROM node:20-alpine

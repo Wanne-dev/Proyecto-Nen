@@ -11,7 +11,13 @@
    ============================================================ */
 import { Router } from "express";
 import { authenticate, authorize } from "../middleware/auth.middleware";
+import { validate } from "../middleware/validation.middleware";
 import { UserRole } from "../models/User";
+import {
+  changeStatusSchema,
+  changeRoleSchema,
+  saveSettingsSchema,
+} from "../validators/admin.validator";
 import {
   listUsers, changeUserStatus, changeUserRole, listAuditLogs,
   getStats, getChartData, getSettings, saveSettings,
@@ -24,12 +30,12 @@ const staffRoles = [UserRole.ADMIN, UserRole.OPERATOR, UserRole.ANALYST];
 router.use(authenticate, authorize(...staffRoles));
 
 router.get("/users", listUsers);
-router.patch("/users/:id/status", changeUserStatus);
-router.patch("/users/:id/role", changeUserRole);
+router.patch("/users/:id/status", validate(changeStatusSchema), changeUserStatus);
+router.patch("/users/:id/role", validate(changeRoleSchema), changeUserRole);
 router.get("/audit", listAuditLogs);
 router.get("/stats", getStats);
 router.get("/chart", getChartData);
 router.get("/settings", getSettings);
-router.put("/settings", saveSettings);
+router.put("/settings", validate(saveSettingsSchema), saveSettings);
 
 export default router;

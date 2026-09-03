@@ -28,29 +28,29 @@ export class VerificationCode {
   @Column({ type: "enum", enum: CodeType })
   type: CodeType;
 
-  @Column({ name: "code", length: 6 })
+  @Column({ type: "varchar", name: "code", length: 6 })
   code: string;
 
-  @Column({ name: "target", length: 255, nullable: true })
-  target: string;
+  @Column({ type: "varchar", name: "target", length: 255, nullable: true })
+  target: string | null;
 
-  @Column({ default: false })
+  @Column({ type: "boolean", default: false })
   used: boolean;
 
-  @Column({ name: "attempts", default: 0 })
+  @Column({ type: "integer", name: "attempts", default: 0 })
   attempts: number;
 
-  @Column({ name: "max_attempts", default: 5 })
+  @Column({ type: "integer", name: "max_attempts", default: 5 })
   maxAttempts: number;
 
   @Column({ name: "expires_at", type: "timestamptz" })
   expiresAt: Date;
 
   @Column({ name: "used_at", type: "timestamptz", nullable: true })
-  usedAt: Date;
+  usedAt: Date | null;
 
-  @Column({ name: "ip_address", nullable: true, length: 45 })
-  ipAddress: string;
+  @Column({ type: "varchar", name: "ip_address", nullable: true, length: 45 })
+  ipAddress: string | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

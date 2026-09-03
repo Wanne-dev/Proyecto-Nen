@@ -21,10 +21,10 @@ export class Asset {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true, length: 20 })
+  @Column({ type: "varchar", unique: true, length: 20 })
   symbol: string;
 
-  @Column({ length: 100 })
+  @Column({ type: "varchar", length: 100 })
   name: string;
 
   @Column({ type: "enum", enum: AssetType })
@@ -34,7 +34,7 @@ export class Asset {
   currentPrice: number;
 
   @Column({ name: "previous_close", type: "decimal", precision: 18, scale: 8, nullable: true })
-  previousClose: number;
+  previousClose: number | null;
 
   @Column({ name: "daily_change", type: "decimal", precision: 10, scale: 4, default: 0 })
   dailyChange: number;
@@ -46,25 +46,25 @@ export class Asset {
   volume24h: number;
 
   @Column({ name: "market_cap", type: "decimal", precision: 18, scale: 2, nullable: true })
-  marketCap: number;
+  marketCap: number | null;
 
   @Column({ name: "high_24h", type: "decimal", precision: 18, scale: 8, nullable: true })
-  high24h: number;
+  high24h: number | null;
 
   @Column({ name: "low_24h", type: "decimal", precision: 18, scale: 8, nullable: true })
-  low24h: number;
+  low24h: number | null;
 
-  @Column({ name: "is_active", default: true })
+  @Column({ type: "boolean", name: "is_active", default: true })
   isActive: boolean;
 
-  @Column({ name: "logo_url", nullable: true, length: 500 })
-  logoUrl: string;
+  @Column({ type: "varchar", name: "logo_url", nullable: true, length: 500 })
+  logoUrl: string | null;
 
   @Column({ name: "description", type: "text", nullable: true })
-  description: string;
+  description: string | null;
 
   @Column({ name: "metadata", type: "jsonb", nullable: true })
-  metadata: object;
+  metadata: object | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

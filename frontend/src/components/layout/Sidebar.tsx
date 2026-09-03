@@ -48,10 +48,6 @@ const BASE_NAV: NavGroup[] = [
     ],
   },
   {
-    title: "Análisis",
-    items: [{ to: "/reports", label: "Reportes", Icon: FileBarChart }],
-  },
-  {
     title: "Configuración",
     items: [
       { to: "/settings", label: "Ajustes", Icon: Settings },
@@ -76,6 +72,10 @@ const ADMIN_NAV: NavGroup[] = [
 function buildNav(role?: string): NavGroup[] {
   const nav: NavGroup[] = [];
   for (const group of BASE_NAV) nav.push({ title: group.title, items: [...group.items] });
+  /* "Análisis" es EXCLUSIVO del administrador: un usuario normal no saca reportes. */
+  if (role === "admin") {
+    nav.push({ title: "Análisis", items: [{ to: "/reports", label: "Reportes", Icon: FileBarChart }] });
+  }
   if (isStaffRole(role)) {
     for (const group of ADMIN_NAV) nav.push({ title: group.title, items: [...group.items] });
   }
@@ -125,7 +125,7 @@ export default function Sidebar() {
   return (
     <aside
       style={{
-        width: w, flexShrink: 0, backgroundColor: C.bg2, borderRight: "1px solid " + C.border,
+        width: w, flexShrink: 0, backgroundColor: "transparent", borderRight: "none",
         display: "flex", flexDirection: "column", fontFamily: FONT, overflowY: "auto",
         transition: "width .18s ease", overflowX: "hidden",
       }}
@@ -137,10 +137,10 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div style={{ lineHeight: 1.1, whiteSpace: "nowrap" }}>
-            <div style={{ fontWeight: 800, fontSize: 15, color: C.t1, letterSpacing: 0.3 }}>
+            <div style={{ fontWeight: 800, fontSize: 17, color: C.t1, letterSpacing: 0.3 }}>
               BANCA <span style={{ color: C.gold }}>NEN</span>
             </div>
-            <div style={{ fontSize: 9, color: C.t3 }}>Inversión inteligente</div>
+            <div style={{ fontSize: 11, color: C.t3 }}>Inversión inteligente</div>
           </div>
         )}
       </div>
@@ -162,7 +162,7 @@ export default function Sidebar() {
                     fontFamily: FONT, color: activeInGroup ? C.gold : C.t3,
                   }}
                 >
-                  <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 }}>
                     {group.title}
                   </span>
                   <ChevronDown size={11} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }} />
@@ -176,7 +176,7 @@ export default function Sidebar() {
                   const active = isActive(item);
                   const itemStyle: React.CSSProperties = {
                     display: "flex", alignItems: "center", gap: 10, padding: collapsed ? "9px 0" : "7px 10px",
-                    marginBottom: 2, borderRadius: 8, textDecoration: "none", fontSize: 12,
+                    marginBottom: 2, borderRadius: 8, textDecoration: "none", fontSize: 14,
                     backgroundColor: active ? C.gold + "16" : "transparent",
                     color: active ? C.t1 : C.t2, fontWeight: active ? 600 : 400,
                     borderLeft: "3px solid " + (active ? C.gold : "transparent"),
@@ -205,7 +205,7 @@ export default function Sidebar() {
                 style={{
                   display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 8,
                   textDecoration: "none", backgroundColor: isAdminPage ? C.blue + "1F" : "transparent",
-                  color: C.t1, fontSize: 12, fontWeight: 600,
+                  color: C.t1, fontSize: 14, fontWeight: 600,
                 }}
               >
                 {isAdminPage ? <ArrowLeft size={15} color={C.blue} /> : <ShieldCheck size={15} color={C.gold} />}
@@ -225,7 +225,7 @@ export default function Sidebar() {
           title={collapsed ? "Expandir menú" : "Colapsar menú"}
           style={{
             display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "none",
-            border: "none", cursor: "pointer", color: C.t3, fontFamily: FONT, fontSize: 11,
+            border: "none", cursor: "pointer", color: C.t3, fontFamily: FONT, fontSize: 13,
             justifyContent: collapsed ? "center" : "flex-start",
           }}
         >
@@ -236,15 +236,15 @@ export default function Sidebar() {
       {/* Usuario */}
       <div style={{ borderTop: "1px solid " + C.border, padding: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "4px 4px" }}>
-          <div style={{ width: 30, height: 30, borderRadius: "50%", backgroundColor: user?.role === "admin" ? C.gold : C.green, color: "#0A0A0F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, borderRadius: "50%", backgroundColor: user?.role === "admin" ? C.gold : C.green, color: "#0A0A0F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
             {initials || "U"}
           </div>
           {!collapsed && (
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.t1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {user?.firstName} {user?.lastName}
               </div>
-              <div style={{ fontSize: 9, color: C.t3 }}>{roleLabel}</div>
+              <div style={{ fontSize: 11, color: C.t3 }}>{roleLabel}</div>
             </div>
           )}
           {!collapsed && (

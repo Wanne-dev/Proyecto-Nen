@@ -8,7 +8,7 @@ export class SystemSetting {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true, length: 100 })
+  @Column({ type: "varchar", unique: true, length: 100 })
   key: string;
 
   @Column({ type: "jsonb", nullable: true })

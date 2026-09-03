@@ -67,7 +67,7 @@ export default function AdminReports() {
 
       <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
         {(["7d", "30d", "90d"] as Range[]).map((r) => (
-          <button key={r} onClick={() => setRange(r)} style={{ padding: "5px 14px", fontSize: 11, fontWeight: range === r ? 700 : 400, borderRadius: 6, backgroundColor: range === r ? C.gold : C.card, color: range === r ? C.bg : C.t2, border: "1px solid " + (range === r ? C.gold : C.border), cursor: "pointer", fontFamily: FONT }}>
+          <button key={r} onClick={() => setRange(r)} style={{ padding: "5px 14px", fontSize: 13, fontWeight: range === r ? 700 : 400, borderRadius: 6, backgroundColor: range === r ? C.gold : C.card, color: range === r ? C.bg : C.t2, border: "1px solid " + (range === r ? C.gold : C.border), cursor: "pointer", fontFamily: FONT }}>
             {r === "7d" ? "7 días" : r === "30d" ? "30 días" : "90 días"}
           </button>
         ))}
@@ -95,7 +95,7 @@ export default function AdminReports() {
             </Card>
             <Card title="Depósitos vs Retiros (USD)">
               <PerformanceChart data={data.map((d) => ({ date: fmtDateShort(d.date), Depósitos: d.deposits }))} dataKey="Depósitos" color={C.green} height={210} gradientId="admTx" />
-              <div style={{ display: "flex", gap: 12, marginTop: 6, fontSize: 10, color: C.t3 }}>
+              <div style={{ display: "flex", gap: 12, marginTop: 6, fontSize: 12, color: C.t3 }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: C.green }} /> Depósitos</span>
                 <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: C.red }} /> Retiros</span>
               </div>
@@ -105,7 +105,7 @@ export default function AdminReports() {
           {stats && (
             <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 10, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
               <Badge tone="green">Sistema operativo</Badge>
-              <span style={{ fontSize: 10, color: C.t2 }}>
+              <span style={{ fontSize: 12, color: C.t2 }}>
                 {stats.activeUsers24h.toLocaleString()} usuarios activos en 24h · {fmtCompact(stats.totalVolumeUsd30d * 0.001)} comisiones acumuladas (30d) · respuesta media {stats.avgResponseMs}ms
               </span>
             </div>

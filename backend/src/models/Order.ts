@@ -43,7 +43,7 @@ export class Order {
   @Column({ name: "user_id", type: "uuid" })
   userId: string;
 
-  @Column({ length: 20 })
+  @Column({ type: "varchar", length: 20 })
   symbol: string;
 
   @Column({ type: "enum", enum: OrderType })
@@ -56,10 +56,10 @@ export class Order {
   status: OrderStatus;
 
   @Column({ type: "decimal", precision: 18, scale: 8, nullable: true })
-  price: number;
+  price: number | null;
 
   @Column({ name: "stop_price", type: "decimal", precision: 18, scale: 8, nullable: true })
-  stopPrice: number;
+  stopPrice: number | null;
 
   @Column({ type: "decimal", precision: 18, scale: 8 })
   quantity: number;
@@ -71,31 +71,31 @@ export class Order {
   avgFillPrice: number;
 
   @Column({ name: "ia_score", nullable: true, type: "decimal", precision: 5, scale: 2 })
-  iaScore: number;
+  iaScore: number | null;
 
   @Column({ name: "ia_explanation", type: "jsonb", nullable: true })
-  iaExplanation: object;
+  iaExplanation: object | null;
 
-  @Column({ name: "ia_risk_level", nullable: true, length: 20 })
-  iaRiskLevel: string;
+  @Column({ type: "varchar", name: "ia_risk_level", nullable: true, length: 20 })
+  iaRiskLevel: string | null;
 
   @Column({ name: "expires_at", type: "timestamptz", nullable: true })
-  expiresAt: Date;
+  expiresAt: Date | null;
 
-  @Column({ name: "time_in_force", length: 10, default: "GTC" })
+  @Column({ type: "varchar", name: "time_in_force", length: 10, default: "GTC" })
   timeInForce: string;
 
   @Column({ type: "decimal", precision: 18, scale: 8, default: 0 })
   commission: number;
 
-  @Column({ name: "ip_address", nullable: true, length: 45 })
-  ipAddress: string;
+  @Column({ type: "varchar", name: "ip_address", nullable: true, length: 45 })
+  ipAddress: string | null;
 
   @Column({ type: "text", nullable: true })
-  notes: string;
+  notes: string | null;
 
   @Column({ type: "jsonb", nullable: true })
-  metadata: object;
+  metadata: object | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt: Date;

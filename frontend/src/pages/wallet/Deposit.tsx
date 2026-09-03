@@ -41,21 +41,21 @@ export default function Deposit() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "18px 0", gap: 10 }}>
             <CheckCircle2 size={48} color={C.green} />
             <div style={{ fontSize: 17, fontWeight: 800, color: C.t1 }}>¡Depósito exitoso!</div>
-            <div style={{ fontSize: 12, color: C.t2 }}>
+            <div style={{ fontSize: 14, color: C.t2 }}>
               Se acreditaron <strong style={{ color: C.green }}>{fmt(done.amount)} {done.currency}</strong> a tu billetera.
             </div>
-            <div style={{ fontSize: 10, color: C.t3 }}>Referencia: {done.reference}</div>
+            <div style={{ fontSize: 12, color: C.t3 }}>Referencia: {done.reference}</div>
             <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
               <button
                 onClick={() => setDone(null)}
-                style={{ padding: "9px 18px", fontSize: 12, fontWeight: 700, borderRadius: 7, backgroundColor: C.card, color: C.t1, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT }}
+                style={{ padding: "9px 18px", fontSize: 14, fontWeight: 700, borderRadius: 7, backgroundColor: C.card, color: C.t1, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT }}
               >
                 Otro depósito
               </button>
               <a
                 href="#/wallet"
                 onClick={(e) => { e.preventDefault(); window.location.hash = "#/wallet"; }}
-                style={{ padding: "9px 18px", fontSize: 12, fontWeight: 700, borderRadius: 7, backgroundColor: C.green, color: C.bg, textDecoration: "none", fontFamily: FONT, display: "inline-flex", alignItems: "center", gap: 6 }}
+                style={{ padding: "9px 18px", fontSize: 14, fontWeight: 700, borderRadius: 7, backgroundColor: C.green, color: C.bg, textDecoration: "none", fontFamily: FONT, display: "inline-flex", alignItems: "center", gap: 6 }}
               >
                 Ver billetera <ArrowRight size={13} />
               </a>
@@ -81,8 +81,8 @@ export default function Deposit() {
               { t: "Límite diario", d: "Hasta USD 50.000 por día (configurable)" },
             ].map((x) => (
               <div key={x.t} style={{ padding: 12, borderRadius: 10, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.t1 }}>{x.t}</div>
-                <div style={{ fontSize: 9, color: C.t3, marginTop: 3 }}>{x.d}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{x.t}</div>
+                <div style={{ fontSize: 11, color: C.t3, marginTop: 3 }}>{x.d}</div>
               </div>
             ))}
           </div>

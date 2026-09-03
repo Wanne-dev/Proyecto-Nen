@@ -66,8 +66,8 @@ export default function Audit() {
       key: "time", header: "Fecha", sortable: true, sortValue: (l) => l.createdAt,
       render: (l) => (
         <div>
-          <div style={{ fontSize: 10, fontWeight: 600, color: C.t1 }}>{timeAgo(l.createdAt)}</div>
-          <div style={{ fontSize: 8, color: C.t3 }}>{fmtDate(l.createdAt)}</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: C.t1 }}>{timeAgo(l.createdAt)}</div>
+          <div style={{ fontSize: 10, color: C.t3 }}>{fmtDate(l.createdAt)}</div>
         </div>
       ),
     },
@@ -75,8 +75,8 @@ export default function Audit() {
       key: "action", header: "Acción", sortable: true, sortValue: (l) => l.action,
       render: (l) => (
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, color: C.t1 }}>{ACTION_LABELS[l.action] || l.action}</div>
-          <div style={{ fontSize: 8, color: C.t3 }}>{l.category}</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>{ACTION_LABELS[l.action] || l.action}</div>
+          <div style={{ fontSize: 10, color: C.t3 }}>{l.category}</div>
         </div>
       ),
     },
@@ -84,8 +84,8 @@ export default function Audit() {
       key: "actor", header: "Actor", sortable: true, sortValue: (l) => l.actor,
       render: (l) => (
         <div style={{ maxWidth: 220 }}>
-          <div style={{ fontSize: 10, color: C.t1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.actor}</div>
-          <div style={{ fontSize: 8, color: C.t3 }}>{l.ip}</div>
+          <div style={{ fontSize: 12, color: C.t1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.actor}</div>
+          <div style={{ fontSize: 10, color: C.t3 }}>{l.ip}</div>
         </div>
       ),
     },
@@ -94,11 +94,11 @@ export default function Audit() {
       render: (l) => <Badge tone={SEVERITY_TONE[l.severity] || "info"}>{l.severity.toUpperCase()}</Badge>,
     },
     {
-      key: "details", header: "Detalle", render: (l) => <span style={{ fontSize: 10, color: C.t2 }}>{l.details}</span>,
+      key: "details", header: "Detalle", render: (l) => <span style={{ fontSize: 12, color: C.t2 }}>{l.details}</span>,
     },
     {
       key: "hash", header: "Hash", render: (l) => (
-        <span style={{ fontFamily: "monospace", fontSize: 8, color: C.t3 }} title={l.hash}>
+        <span style={{ fontFamily: "monospace", fontSize: 10, color: C.t3 }} title={l.hash}>
           {l.hash.slice(0, 10)}…
         </span>
       ),
@@ -123,7 +123,7 @@ export default function Audit() {
   };
 
   const selectSt: React.CSSProperties = {
-    padding: "6px 10px", fontSize: 11, borderRadius: 6, backgroundColor: C.card,
+    padding: "6px 10px", fontSize: 13, borderRadius: 6, backgroundColor: C.card,
     border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT, cursor: "pointer",
   };
 
@@ -136,7 +136,7 @@ export default function Audit() {
         actions={<Button variant="outline" size="sm" icon={<Download size={13} />} onClick={handleExport}>Exportar CSV</Button>}
       />
 
-      <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 10, backgroundColor: C.gold + "0D", border: "1px solid " + C.gold + "33", fontSize: 10, color: C.t2, display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 10, backgroundColor: C.gold + "0D", border: "1px solid " + C.gold + "33", fontSize: 12, color: C.t2, display: "flex", alignItems: "center", gap: 8 }}>
         <Link2 size={13} color={C.gold} />
         Cada registro contiene el hash del registro anterior. Alterar un evento rompe la cadena y es detectado al instante.
       </div>
@@ -155,7 +155,7 @@ export default function Audit() {
             <option value="danger">Crítico</option>
           </select>
           <div style={{ flex: 1 }} />
-          <span style={{ fontSize: 10, color: C.t3 }}>{logs.length} eventos</span>
+          <span style={{ fontSize: 12, color: C.t3 }}>{logs.length} eventos</span>
         </div>
 
         {loading ? (
@@ -181,17 +181,17 @@ export default function Audit() {
               { label: "Fecha", value: fmtDate(selected.createdAt) },
             ].map((x) => (
               <div key={x.label} style={{ padding: "8px 10px", borderRadius: 7, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                <div style={{ fontSize: 9, color: C.t3 }}>{x.label}</div>
-                <div style={{ fontSize: 11, color: C.t1, marginTop: 2, wordBreak: "break-word" }}>{x.value}</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>{x.label}</div>
+                <div style={{ fontSize: 13, color: C.t1, marginTop: 2, wordBreak: "break-word" }}>{x.value}</div>
               </div>
             ))}
             <div style={{ padding: "8px 10px", borderRadius: 7, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-              <div style={{ fontSize: 9, color: C.t3 }}>Hash actual (SHA-256)</div>
-              <div style={{ fontFamily: "monospace", fontSize: 9, color: C.green, marginTop: 3, wordBreak: "break-all" }}>{selected.hash}</div>
+              <div style={{ fontSize: 11, color: C.t3 }}>Hash actual (SHA-256)</div>
+              <div style={{ fontFamily: "monospace", fontSize: 11, color: C.green, marginTop: 3, wordBreak: "break-all" }}>{selected.hash}</div>
             </div>
             <div style={{ padding: "8px 10px", borderRadius: 7, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-              <div style={{ fontSize: 9, color: C.t3 }}>Hash previo (encadenado)</div>
-              <div style={{ fontFamily: "monospace", fontSize: 9, color: C.t2, marginTop: 3, wordBreak: "break-all" }}>{selected.prevHash}</div>
+              <div style={{ fontSize: 11, color: C.t3 }}>Hash previo (encadenado)</div>
+              <div style={{ fontFamily: "monospace", fontSize: 11, color: C.t2, marginTop: 3, wordBreak: "break-all" }}>{selected.prevHash}</div>
             </div>
           </div>
         )}

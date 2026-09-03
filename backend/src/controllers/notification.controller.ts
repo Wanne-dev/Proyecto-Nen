@@ -1,6 +1,6 @@
 /* Controladores de Notificaciones — BANCA NEN */
 import { Request, Response, NextFunction } from "express";
-import { listUserNotifications, markRead, markAllRead } from "../services/admin.service";
+import { listUserNotifications, markRead, markAllRead } from "../services/notification.service";
 
 export async function listNotifications(req: Request, res: Response, next: NextFunction) {
   try {

@@ -147,7 +147,7 @@ export const registerUser = async (data: {
     logger.error("Registro: excepcion enviando email de verificacion: " + error);
   }
 
-  if (SMS_ENABLED) {
+  if (SMS_ENABLED && savedUser.phone) {
     try {
       await sendVerificationSMS(savedUser.phone, phoneCode);
     } catch (error) {
@@ -345,7 +345,7 @@ export const resendVerificationCodes = async (userId: string) => {
     }
   }
 
-  if (!user.phoneVerified && SMS_ENABLED) {
+  if (!user.phoneVerified && SMS_ENABLED && user.phone) {
     sendVerificationSMS(user.phone, phoneCode).catch((e) => logger.warn("SMS: " + e));
   }
 

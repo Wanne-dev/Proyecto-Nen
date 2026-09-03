@@ -27,7 +27,7 @@ function LiveCandlestick() {
     const cw = w / 4;
     const drawW = canvas.offsetWidth;
     const drawH = canvas.offsetHeight;
-    let candles: { o: number; c: number; h: number; l: number; bull: boolean }[] = [];
+    const candles: { o: number; c: number; h: number; l: number; bull: boolean }[] = [];
     let price = 50;
     for (let i = 0; i < 30; i++) {
       const change = (Math.random() - 0.45) * 8;
@@ -121,7 +121,7 @@ function TickerBar() {
           <span key={i} className="flex items-center gap-2 text-xs font-mono">
             <span className="text-gray-500">{item.symbol}</span>
             <span className="text-gray-300">${item.price}</span>
-            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${item.up ? "text-emerald-400 bg-emerald-400/10" : "text-red-400 bg-red-400/10"}`}>{item.change}</span>
+            <span className={`px-1.5 py-0.5 rounded text-[12px] font-medium ${item.up ? "text-emerald-400 bg-emerald-400/10" : "text-red-400 bg-red-400/10"}`}>{item.change}</span>
           </span>
         ))}
       </motion.div>
@@ -138,11 +138,11 @@ function PhoneMockup() {
         <div className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden">
           <div className="p-4 pt-10">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] text-gray-500">Portfolio</span>
-              <span className="text-[10px] text-emerald-400 font-mono">+12.4%</span>
+              <span className="text-[12px] text-gray-500">Portfolio</span>
+              <span className="text-[12px] text-emerald-400 font-mono">+12.4%</span>
             </div>
             <p className="text-2xl font-bold tracking-tight">$127,432</p>
-            <p className="text-[10px] text-gray-500 mt-1">Balance total</p>
+            <p className="text-[12px] text-gray-500 mt-1">Balance total</p>
             <div className="mt-4 h-20 rounded-2xl overflow-hidden bg-[#111]">
               <LiveCandlestick />
             </div>
@@ -159,23 +159,23 @@ function PhoneMockup() {
                   transition={{ delay: 1 + i * 0.2 }}
                   className="flex items-center justify-between py-1.5 border-b border-white/5"
                 >
-                  <span className="text-[11px] font-mono text-gray-400">{a.name}</span>
-                  <span className="text-[11px] font-mono text-gray-300">{a.val}</span>
-                  <span className={`text-[9px] font-mono ${a.up ? "text-emerald-400" : "text-red-400"}`}>{a.ch}</span>
+                  <span className="text-[13px] font-mono text-gray-400">{a.name}</span>
+                  <span className="text-[13px] font-mono text-gray-300">{a.val}</span>
+                  <span className={`text-[11px] font-mono ${a.up ? "text-emerald-400" : "text-red-400"}`}>{a.ch}</span>
                 </motion.div>
               ))}
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2">
               <div className="bg-[#00d4aa] rounded-xl py-2 text-center">
-                <span className="text-[10px] font-bold text-black">Comprar</span>
+                <span className="text-[12px] font-bold text-black">Comprar</span>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl py-2 text-center">
-                <span className="text-[10px] font-medium text-gray-300">Vender</span>
+                <span className="text-[12px] font-medium text-gray-300">Vender</span>
               </div>
             </div>
             <div className="mt-3 flex items-center justify-center gap-1">
               {["IA", "Mercado", "Portfolio"].map((t, i) => (
-                <span key={i} className={`text-[9px] px-2 py-1 rounded-full ${i === 0 ? "bg-[#0a84ff]/20 text-[#0a84ff]" : "text-gray-600"}`}>{t}</span>
+                <span key={i} className={`text-[11px] px-2 py-1 rounded-full ${i === 0 ? "bg-[#0a84ff]/20 text-[#0a84ff]" : "text-gray-600"}`}>{t}</span>
               ))}
             </div>
           </div>
@@ -207,14 +207,14 @@ export default function Landing() {
             </div>
             <span className="text-lg font-bold tracking-tight">BANCA <span className="text-[#00d4aa]">NEN</span></span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-[13px] text-gray-400">
+          <div className="hidden md:flex items-center gap-8 text-[15px] text-gray-400">
             <a href="#platform" className="hover:text-white transition-colors">Plataforma</a>
             <a href="#ai" className="hover:text-white transition-colors">IA</a>
             <a href="#security" className="hover:text-white transition-colors">Seguridad</a>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/login")} className="text-[13px] text-gray-300 hover:text-white transition-colors px-4 py-2">Iniciar sesion</button>
-            <button onClick={() => navigate("/register")} className="text-[13px] bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold px-5 py-2 rounded-full transition-colors">Abrir cuenta</button>
+            <button onClick={() => navigate("/login")} className="text-[15px] text-gray-300 hover:text-white transition-colors px-4 py-2">Iniciar sesion</button>
+            <button onClick={() => navigate("/register")} className="text-[15px] bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold px-5 py-2 rounded-full transition-colors">Abrir cuenta</button>
           </div>
         </div>
       </motion.nav>
@@ -228,7 +228,7 @@ export default function Landing() {
             <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8">
                 <Activity className="w-3.5 h-3.5 text-[#00d4aa]" />
-                <span className="text-xs text-gray-300">Mercados abiertos — Vol. $24.5B en las ultimas 24h</span>
+                <span className="text-xs text-gray-300">Mercados abiertos Â· Vol. $24.5B en las ultimas 24h</span>
               </div>
 
               <h1 className="text-[3.5rem] md:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-[-0.03em] leading-[0.92]">
@@ -244,11 +244,11 @@ export default function Landing() {
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <button onClick={() => navigate("/register")} className="group flex items-center gap-2 bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold px-8 py-4 rounded-full text-[15px] transition-all hover:shadow-[0_0_40px_rgba(0,212,170,0.25)]">
+                <button onClick={() => navigate("/register")} className="group flex items-center gap-2 bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold px-8 py-4 rounded-full text-[17px] transition-all hover:shadow-[0_0_40px_rgba(0,212,170,0.25)]">
                   Empezar a operar
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="flex items-center gap-2 text-gray-300 hover:text-white px-6 py-4 rounded-full text-[15px] transition-colors border border-white/10 hover:border-white/20">
+                <button className="flex items-center gap-2 text-gray-300 hover:text-white px-6 py-4 rounded-full text-[17px] transition-colors border border-white/10 hover:border-white/20">
                   <Activity className="w-4 h-4" />
                   Ver mercados en vivo
                 </button>
@@ -276,12 +276,12 @@ export default function Landing() {
       <section className="py-24 border-y border-white/5">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-            <span className="text-[#00d4aa] text-[13px] font-medium tracking-widest uppercase">Mercado en vivo</span>
+            <span className="text-[#00d4aa] text-[15px] font-medium tracking-widest uppercase">Mercado en vivo</span>
             <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-[-0.02em] mt-4 leading-tight">
               BTC/USD
               <span className="text-emerald-400 ml-3 text-[2rem]">+2.34%</span>
             </h2>
-            <p className="text-gray-500 text-sm font-mono mt-1">Simulacion en tiempo real — datos ilustrativos</p>
+            <p className="text-gray-500 text-sm font-mono mt-1">Simulacion en tiempo real Â· datos ilustrativos</p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-8 h-[300px] md:h-[400px] rounded-3xl overflow-hidden bg-[#080808]">
             <LiveCandlestick />
@@ -293,7 +293,7 @@ export default function Landing() {
       <section id="platform" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-24">
-            <span className="text-[#00d4aa] text-[13px] font-medium tracking-widest uppercase">Plataforma</span>
+            <span className="text-[#00d4aa] text-[15px] font-medium tracking-widest uppercase">Plataforma</span>
             <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-[-0.02em] mt-4 leading-tight">
               Construida para traders,
               <br />
@@ -310,15 +310,15 @@ export default function Landing() {
             ].map((feature, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="group border-t border-white/5 py-12 last:border-b hover:bg-white/[0.01] transition-colors cursor-default">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                  <div className="lg:col-span-1"><span className="text-[13px] text-gray-600 font-mono">0{i + 1}</span></div>
+                  <div className="lg:col-span-1"><span className="text-[15px] text-gray-600 font-mono">0{i + 1}</span></div>
                   <div className="lg:col-span-3">
-                    <span className="text-[#00d4aa] text-[13px] font-medium">{feature.subtitle}</span>
+                    <span className="text-[#00d4aa] text-[15px] font-medium">{feature.subtitle}</span>
                     <h3 className="text-2xl md:text-3xl font-bold mt-1 tracking-tight">{feature.title}</h3>
                   </div>
                   <div className="lg:col-span-5"><p className="text-gray-400 leading-relaxed">{feature.desc}</p></div>
                   <div className="lg:col-span-3 flex flex-wrap gap-2">
                     {feature.metrics.map((m, j) => (
-                      <span key={j} className="text-[11px] font-mono text-gray-500 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full">{m}</span>
+                      <span key={j} className="text-[13px] font-mono text-gray-500 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full">{m}</span>
                     ))}
                   </div>
                 </div>
@@ -334,7 +334,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <span className="text-[#0a84ff] text-[13px] font-medium tracking-widest uppercase">Inteligencia Artificial</span>
+              <span className="text-[#0a84ff] text-[15px] font-medium tracking-widest uppercase">Inteligencia Artificial</span>
               <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-[-0.02em] mt-4 leading-tight">
                 No es magia.
                 <br />
@@ -343,7 +343,7 @@ export default function Landing() {
               <p className="text-gray-400 mt-6 text-[17px] leading-relaxed max-w-lg">
                 Nuestros modelos de machine learning analizan millones de datos de mercado en tiempo real. Patrones estadisticos, correlaciones, y anomalias que el ojo humano no detecta.
               </p>
-              <p className="text-gray-500 mt-4 text-[15px] leading-relaxed max-w-lg">
+              <p className="text-gray-500 mt-4 text-[17px] leading-relaxed max-w-lg">
                 No predice el futuro. Identifica probabilidades con datos historicos. Tu decides si operar o no.
               </p>
               <div className="mt-8 space-y-3">
@@ -355,7 +355,7 @@ export default function Landing() {
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#0a84ff]" />
-                    <span className="text-gray-300 text-[15px]">{item}</span>
+                    <span className="text-gray-300 text-[17px]">{item}</span>
                   </div>
                 ))}
               </div>
@@ -365,7 +365,7 @@ export default function Landing() {
               <div className="bg-[#080808] rounded-3xl border border-white/5 overflow-hidden">
                 <div className="flex items-center gap-2 px-6 py-4 border-b border-white/5">
                   <BrainCircuit className="w-4 h-4 text-[#0a84ff]" />
-                  <span className="text-xs text-gray-400 font-medium">NEN AI — Analisis en vivo</span>
+                  <span className="text-xs text-gray-400 font-medium">NEN AI Â· Analisis en vivo</span>
                   <span className="ml-auto w-2 h-2 rounded-full bg-[#0a84ff] animate-pulse" />
                 </div>
                 <div className="p-6 space-y-0">
@@ -377,14 +377,14 @@ export default function Landing() {
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
                       <span className="text-sm font-mono text-gray-300">{item.symbol}</span>
-                      <span className={`text-[11px] font-semibold px-2 py-1 rounded ${item.signal === "ALCISTA" ? "text-emerald-400 bg-emerald-400/10" : item.signal === "BAJISTA" ? "text-red-400 bg-red-400/10" : "text-yellow-400 bg-yellow-400/10"}`}>{item.signal}</span>
+                      <span className={`text-[13px] font-semibold px-2 py-1 rounded ${item.signal === "ALCISTA" ? "text-emerald-400 bg-emerald-400/10" : item.signal === "BAJISTA" ? "text-red-400 bg-red-400/10" : "text-yellow-400 bg-yellow-400/10"}`}>{item.signal}</span>
                       <span className="text-xs text-gray-500 font-mono">{item.prob}</span>
-                      <span className="text-[11px] text-gray-600">{item.tf}</span>
+                      <span className="text-[13px] text-gray-600">{item.tf}</span>
                     </div>
                   ))}
                 </div>
                 <div className="px-6 py-3 border-t border-white/5 bg-white/[0.02]">
-                  <p className="text-[10px] text-gray-600 font-mono">Los signals son probabilidades estadisticas, no recomendaciones de inversion. Opera bajo tu propio criterio.</p>
+                  <p className="text-[12px] text-gray-600 font-mono">Los signals son probabilidades estadisticas, no recomendaciones de inversion. Opera bajo tu propio criterio.</p>
                 </div>
               </div>
             </motion.div>
@@ -396,7 +396,7 @@ export default function Landing() {
       <section id="security" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-20">
-            <span className="text-gray-500 text-[13px] font-medium tracking-widest uppercase">Seguridad</span>
+            <span className="text-gray-500 text-[15px] font-medium tracking-widest uppercase">Seguridad</span>
             <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-[-0.02em] mt-4">Tu capital, protegido.</h2>
             <p className="text-gray-400 mt-4 text-[17px] max-w-xl mx-auto">Encriptacion AES-256. Autenticacion 2FA. Fondos segregados. Monitoreo 24/7.</p>
           </motion.div>
@@ -410,7 +410,7 @@ export default function Landing() {
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="text-center">
                 <item.icon className="w-8 h-8 text-[#00d4aa] mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="text-gray-400 text-[15px] leading-relaxed">{item.desc}</p>
+                <p className="text-gray-400 text-[17px] leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -448,8 +448,8 @@ export default function Landing() {
               </div>
               <span className="text-sm font-bold">BANCA NEN</span>
             </div>
-            <p className="text-[11px] text-gray-600">El trading conlleva riesgo. Los resultados pasados no garantizan resultados futuros. Opera responsablemente.</p>
-            <p className="text-[11px] text-gray-600">2026 BANCA NEN. Todos los derechos reservados.</p>
+            <p className="text-[13px] text-gray-600">El trading conlleva riesgo. Los resultados pasados no garantizan resultados futuros. Opera responsablemente.</p>
+            <p className="text-[13px] text-gray-600">2026 BANCA NEN. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

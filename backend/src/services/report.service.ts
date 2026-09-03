@@ -46,13 +46,14 @@ export async function getPortfolio(userId: string, range: "7d" | "30d" | "90d" =
     series.push({ date: d, value: Math.round(running * 100) / 100 });
   }
 
-  const allocation = balances
+  const allocation: Array<{ currency: string; balance: number; usdRate: number; valueUsd: number; pct: number }> = balances
     .filter((b) => num(b.balance) > 0)
     .map((b) => ({
-      currency: b.currency,
+      currency: String(b.currency),
       balance: num(b.balance),
       usdRate: num(b.usdRate),
       valueUsd: Math.round(num(b.balance) * num(b.usdRate) * 100) / 100,
+      pct: 0,
     }))
     .filter((a) => a.valueUsd > 0)
     .sort((a, b) => b.valueUsd - a.valueUsd);

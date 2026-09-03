@@ -59,7 +59,7 @@ export default function Table<T>({ columns, data, rowKey, pageSize = 10, emptyMe
   return (
     <div style={{ fontFamily: FONT }}>
       <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ backgroundColor: C.bg2 }}>
               {columns.map((col) => (
@@ -76,7 +76,7 @@ export default function Table<T>({ columns, data, rowKey, pageSize = 10, emptyMe
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                     {col.header}
                     {sortKey === col.key && (
-                      <span style={{ color: C.gold, fontSize: 9 }}>{sortDir === "asc" ? "▲" : "▼"}</span>
+                      <span style={{ color: C.gold, fontSize: 11 }}>{sortDir === "asc" ? "▲" : "▼"}</span>
                     )}
                   </span>
                 </th>
@@ -86,7 +86,7 @@ export default function Table<T>({ columns, data, rowKey, pageSize = 10, emptyMe
           <tbody>
             {visible.length === 0 && (
               <tr>
-                <td colSpan={columns.length} style={{ padding: 32, textAlign: "center", color: C.t3, fontSize: 12 }}>
+                <td colSpan={columns.length} style={{ padding: 32, textAlign: "center", color: C.t3, fontSize: 14 }}>
                   {emptyMessage}
                 </td>
               </tr>
@@ -105,7 +105,7 @@ export default function Table<T>({ columns, data, rowKey, pageSize = 10, emptyMe
       </div>
       {paginated && totalPages > 1 && (
         <div style={{ padding: "10px 12px", borderTop: "1px solid " + C.border, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 10, color: C.t3 }}>
+          <span style={{ fontSize: 12, color: C.t3 }}>
             {sorted.length} registros · Página {safePage} de {totalPages}
           </span>
           <Pagination page={safePage} totalPages={totalPages} onChange={setPage} compact />

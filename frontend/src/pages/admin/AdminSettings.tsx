@@ -87,8 +87,8 @@ export default function AdminSettings() {
   const toggleRow = (label: string, desc: string, key: "maintenanceMode" | "allowRegistration" | "kycRequired" | "twoFactorRequired") => (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderBottom: "1px solid " + C.border }}>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: C.t1 }}>{label}</div>
-        <div style={{ fontSize: 9, color: C.t3 }}>{desc}</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: C.t1 }}>{label}</div>
+        <div style={{ fontSize: 11, color: C.t3 }}>{desc}</div>
       </div>
       <Toggle checked={settings[key]} onChange={(v) => set({ [key]: v } as any)} />
     </div>
@@ -98,7 +98,7 @@ export default function AdminSettings() {
     return (
       <div>
         <PageHeader title="Configuración del Sistema" subtitle="Parámetros globales de la plataforma" icon={<ServerCog size={19} color={C.blue} />} />
-        <div style={{ padding: 60, textAlign: "center", color: C.t3, fontSize: 12 }}>Cargando configuración...</div>
+        <div style={{ padding: 60, textAlign: "center", color: C.t3, fontSize: 14 }}>Cargando configuración...</div>
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function AdminSettings() {
       />
 
       {settings.maintenanceMode && (
-        <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 10, backgroundColor: C.gold + "15", border: "1px solid " + C.gold, fontSize: 11, color: C.gold, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 10, backgroundColor: C.gold + "15", border: "1px solid " + C.gold, fontSize: 13, color: C.gold, display: "flex", alignItems: "center", gap: 8 }}>
           <AlertTriangle size={14} /> ¡Atención! La plataforma está en modo mantenimiento. Los usuarios verán una pantalla de mantenimiento.
         </div>
       )}
@@ -158,7 +158,7 @@ export default function AdminSettings() {
           <Card title="Notificaciones del sistema" subtitle="Canales habilitados">
             {(["email", "sms", "push", "securityAlerts", "marketAlerts"] as const).map((key) => (
               <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid " + C.border }}>
-                <span style={{ fontSize: 11, color: C.t1, textTransform: "capitalize" }}>{key === "securityAlerts" ? "Alertas de seguridad" : key === "marketAlerts" ? "Alertas de mercado" : key}</span>
+                <span style={{ fontSize: 13, color: C.t1, textTransform: "capitalize" }}>{key === "securityAlerts" ? "Alertas de seguridad" : key === "marketAlerts" ? "Alertas de mercado" : key}</span>
                 <Toggle checked={settings.notifications[key]} onChange={(v) => set({ notifications: { ...settings.notifications, [key]: v } })} />
               </div>
             ))}
@@ -173,7 +173,7 @@ export default function AdminSettings() {
               {numField("Comisión de retiro", "withdrawalFee", "ej: 0.0015 = 0.15%")}
               {numField("Umbral sospechoso", "suspiciousThreshold", "0.0 - 1.0 (SARLAFT)")}
             </div>
-            <div style={{ marginTop: 10, fontSize: 9, color: C.t3, lineHeight: 1.5, display: "flex", gap: 6 }}>
+            <div style={{ marginTop: 10, fontSize: 11, color: C.t3, lineHeight: 1.5, display: "flex", gap: 6 }}>
               <ShieldCheck size={12} color={C.green} />
               Las comisiones se auditan en la cadena inmutable y se concilian diariamente con Wompi.
             </div>
@@ -186,17 +186,17 @@ export default function AdminSettings() {
                 value={newCountry}
                 onChange={(e) => setNewCountry(e.target.value)}
                 placeholder="Agregar país..."
-                style={{ flex: 1, padding: "8px 10px", fontSize: 12, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}
+                style={{ flex: 1, padding: "8px 10px", fontSize: 14, borderRadius: 6, backgroundColor: C.card, border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT }}
                 onKeyDown={(e) => { if (e.key === "Enter") addCountry(); }}
               />
               <Button variant="outline" size="sm" onClick={addCountry}>Agregar</Button>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {settings.allowedCountries.map((c) => (
-                <span key={c} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 8px", borderRadius: 999, backgroundColor: C.card, border: "1px solid " + C.border, fontSize: 10, color: C.t1 }}>
+                <span key={c} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 8px", borderRadius: 999, backgroundColor: C.card, border: "1px solid " + C.border, fontSize: 12, color: C.t1 }}>
                   <Globe2 size={10} color={C.blue} />
                   {c}
-                  <button onClick={() => removeCountry(c)} style={{ background: "none", border: "none", cursor: "pointer", color: C.t3, fontSize: 11, padding: 0 }}>×</button>
+                  <button onClick={() => removeCountry(c)} style={{ background: "none", border: "none", cursor: "pointer", color: C.t3, fontSize: 13, padding: 0 }}>×</button>
                 </span>
               ))}
             </div>
@@ -216,7 +216,7 @@ export default function AdminSettings() {
               ].map((x) => (
                 <div key={x.t} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Coins size={11} color={C.green} />
-                  <span style={{ flex: 1, fontSize: 10, color: C.t1 }}>{x.t}</span>
+                  <span style={{ flex: 1, fontSize: 12, color: C.t1 }}>{x.t}</span>
                   <Badge tone="green">{x.d}</Badge>
                 </div>
               ))}

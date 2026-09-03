@@ -1,2 +1,4 @@
-// Archivo: backend/src/middleware/logger.middleware.ts
-// Propósito: Logging de peticiones
+/* Logging de peticiones HTTP (morgan) â€” BANCA NEN */
+import morgan from "morgan";
+
+export const loggerMiddleware = morgan("dev");

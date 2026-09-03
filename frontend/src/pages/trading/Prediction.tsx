@@ -65,7 +65,7 @@ export default function Prediction() {
         title="Predicción IA"
         subtitle="Ensamble LSTM + Random Forest + XGBoost · 32 variables · entrenamiento diario automático"
         icon={<BrainCircuit size={19} color={C.purple} />}
-        actions={<button onClick={load} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", fontSize: 11, borderRadius: 7, backgroundColor: C.card, color: C.t1, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT }}><RefreshCw size={13} /> Actualizar</button>}
+        actions={<button onClick={load} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", fontSize: 13, borderRadius: 7, backgroundColor: C.card, color: C.t1, border: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT }}><RefreshCw size={13} /> Actualizar</button>}
       />
 
       {/* Modelo */}
@@ -75,8 +75,8 @@ export default function Prediction() {
             <div style={{ padding: 12, display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: C.purple + "1F", display: "flex", alignItems: "center", justifyContent: "center" }}><Cpu size={15} color={C.purple} /></span>
               <div>
-                <div style={{ fontSize: 9, color: C.t3 }}>Modelo activo</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{model.name}</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>Modelo activo</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{model.name}</div>
               </div>
             </div>
           </Card>
@@ -84,8 +84,8 @@ export default function Prediction() {
             <div style={{ padding: 12, display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: C.green + "1F", display: "flex", alignItems: "center", justifyContent: "center" }}><Target size={15} color={C.green} /></span>
               <div>
-                <div style={{ fontSize: 9, color: C.t3 }}>Precisión global</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{Math.round(model.accuracy * 100)}%</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>Precisión global</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{Math.round(model.accuracy * 100)}%</div>
               </div>
             </div>
           </Card>
@@ -93,8 +93,8 @@ export default function Prediction() {
             <div style={{ padding: 12, display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: C.blue + "1F", display: "flex", alignItems: "center", justifyContent: "center" }}><Gauge size={15} color={C.blue} /></span>
               <div>
-                <div style={{ fontSize: 9, color: C.t3 }}>Muestras de entrenamiento</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.t1 }}>{model.samples.toLocaleString()}</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>Muestras de entrenamiento</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{model.samples.toLocaleString()}</div>
               </div>
             </div>
           </Card>
@@ -102,8 +102,8 @@ export default function Prediction() {
             <div style={{ padding: 12, display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: C.gold + "1F", display: "flex", alignItems: "center", justifyContent: "center" }}><BrainCircuit size={15} color={C.gold} /></span>
               <div>
-                <div style={{ fontSize: 9, color: C.t3 }}>Último entrenamiento</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.t1 }}>{fmtDate(model.lastTraining)}</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>Último entrenamiento</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{fmtDate(model.lastTraining)}</div>
               </div>
             </div>
           </Card>
@@ -123,12 +123,12 @@ export default function Prediction() {
                 borderBottom: "1px solid " + C.border, cursor: "pointer", fontFamily: FONT,
               }}
             >
-              <span style={{ fontSize: 10, fontWeight: 800, color: i < 3 ? C.gold : C.t3, width: 18 }}>{i + 1}</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: i < 3 ? C.gold : C.t3, width: 18 }}>{i + 1}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.t1 }}>{p.symbol}</div>
-                <div style={{ fontSize: 9, color: C.t3 }}>{HORIZON_LABELS[p.horizon]}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{p.symbol}</div>
+                <div style={{ fontSize: 11, color: C.t3 }}>{HORIZON_LABELS[p.horizon]}</div>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 800, color: p.score >= 65 ? C.green : p.score >= 45 ? C.gold : C.red }}>
+              <span style={{ fontSize: 12, fontWeight: 800, color: p.score >= 65 ? C.green : p.score >= 45 ? C.gold : C.red }}>
                 {p.score}
               </span>
             </button>
@@ -141,12 +141,12 @@ export default function Prediction() {
             <Card>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: C.purple + "1F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: C.purple }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: C.purple + "1F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: C.purple }}>
                     {selected.symbol.slice(0, 2)}
                   </div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: C.t1 }}>{selected.name} <span style={{ color: C.t3, fontWeight: 600 }}>· {selected.symbol}/USD</span></div>
-                    <div style={{ fontSize: 10, color: C.t3 }}>Horizonte: {HORIZON_LABELS[selected.horizon]}</div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: C.t1 }}>{selected.name} <span style={{ color: C.t3, fontWeight: 600 }}>· {selected.symbol}/USD</span></div>
+                    <div style={{ fontSize: 12, color: C.t3 }}>Horizonte: {HORIZON_LABELS[selected.horizon]}</div>
                   </div>
                 </div>
                 <ScoreDisplay score={selected.score} confidence={selected.confidence} size="lg" />
@@ -154,21 +154,21 @@ export default function Prediction() {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginTop: 16 }}>
                 <div style={{ padding: 12, borderRadius: 9, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                  <div style={{ fontSize: 9, color: C.t3 }}>Precio actual</div>
+                  <div style={{ fontSize: 11, color: C.t3 }}>Precio actual</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: C.t1 }}>{fmt(selected.currentPrice, selected.currentPrice < 1 ? 4 : 2)}</div>
                 </div>
                 <div style={{ padding: 12, borderRadius: 9, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                  <div style={{ fontSize: 9, color: C.t3 }}>Precio pronosticado</div>
+                  <div style={{ fontSize: 11, color: C.t3 }}>Precio pronosticado</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: selected.predictedChangePct >= 0 ? C.green : C.red }}>{fmt(selected.predictedPrice, selected.predictedPrice < 1 ? 4 : 2)}</div>
                 </div>
                 <div style={{ padding: 12, borderRadius: 9, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                  <div style={{ fontSize: 9, color: C.t3 }}>Cambio esperado</div>
+                  <div style={{ fontSize: 11, color: C.t3 }}>Cambio esperado</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: selected.predictedChangePct >= 0 ? C.green : C.red }}>
                     {selected.predictedChangePct >= 0 ? "+" : ""}{selected.predictedChangePct.toFixed(2)}%
                   </div>
                 </div>
                 <div style={{ padding: 12, borderRadius: 9, backgroundColor: C.bg2, border: "1px solid " + C.border }}>
-                  <div style={{ fontSize: 9, color: C.t3 }}>Señal</div>
+                  <div style={{ fontSize: 11, color: C.t3 }}>Señal</div>
                   <div style={{ marginTop: 4 }}>
                     {selected.signal === "buy" && <Badge tone="green" icon={<TrendingUp size={9} />}>COMPRAR</Badge>}
                     {selected.signal === "sell" && <Badge tone="red" icon={<TrendingDown size={9} />}>VENDER</Badge>}
@@ -187,7 +187,7 @@ export default function Prediction() {
                     const positive = f.impact >= 0;
                     return (
                       <div key={f.name + i}>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, marginBottom: 3 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
                           <span style={{ color: C.t2 }}>{f.name}</span>
                           <span style={{ color: positive ? C.green : C.red, fontWeight: 600 }}>
                             {positive ? "+" : ""}{f.impact.toFixed(2)}
@@ -201,7 +201,7 @@ export default function Prediction() {
                     );
                   })}
                 </div>
-                <div style={{ marginTop: 10, fontSize: 9, color: C.t3 }}>
+                <div style={{ marginTop: 10, fontSize: 11, color: C.t3 }}>
                   Los valores SHAP muestran cómo cada variable empuja la predicción hacia arriba (verde) o abajo (rojo).
                 </div>
               </Card>

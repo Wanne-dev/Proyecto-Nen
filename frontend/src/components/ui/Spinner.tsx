@@ -11,7 +11,7 @@ export default function Spinner({ size = 22, color = C.gold, label }: { size?: n
           animation: "spin 0.8s linear infinite",
         }}
       />
-      {label && <span style={{ fontSize: 11, color: C.t2 }}>{label}</span>}
+      {label && <span style={{ fontSize: 13, color: C.t2 }}>{label}</span>}
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );

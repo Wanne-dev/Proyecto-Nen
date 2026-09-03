@@ -61,7 +61,7 @@ export default function Reports() {
         <CalendarDays size={14} color={C.t3} />
         <div style={{ display: "flex", gap: 4 }}>
           {ranges.map((r) => (
-            <button key={r} onClick={() => setRange(r)} style={{ padding: "5px 14px", fontSize: 11, fontWeight: range === r ? 700 : 400, borderRadius: 6, backgroundColor: range === r ? C.gold : C.card, color: range === r ? C.bg : C.t2, border: "1px solid " + (range === r ? C.gold : C.border), cursor: "pointer", fontFamily: FONT }}>
+            <button key={r} onClick={() => setRange(r)} style={{ padding: "5px 14px", fontSize: 13, fontWeight: range === r ? 700 : 400, borderRadius: 6, backgroundColor: range === r ? C.gold : C.card, color: range === r ? C.bg : C.t2, border: "1px solid " + (range === r ? C.gold : C.border), cursor: "pointer", fontFamily: FONT }}>
               {r === "7d" ? "7 días" : r === "30d" ? "30 días" : "90 días"}
             </button>
           ))}
@@ -86,7 +86,7 @@ export default function Reports() {
             {/* Serie */}
             <Card title={`Rendimiento · últimos ${range === "7d" ? "7" : range === "30d" ? "30" : "90"} días`} subtitle="Valor del portafolio en USD">
               <PerformanceChart data={report.series.map((p) => ({ ...p, date: fmtDateShort(p.date) }))} color={report.pnlPct >= 0 ? C.green : C.red} height={280} />
-              <div style={{ display: "flex", gap: 14, marginTop: 10, fontSize: 10, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 14, marginTop: 10, fontSize: 12, flexWrap: "wrap" }}>
                 <span style={{ color: C.t3 }}>Mejor activo: <strong style={{ color: C.green }}>{report.bestAsset}</strong></span>
                 <span style={{ color: C.t3 }}>Activo más débil: <strong style={{ color: C.red }}>{report.worstAsset}</strong></span>
                 <span style={{ color: C.t3 }}>Rendimiento: <strong style={{ color: report.pnlPct >= 0 ? C.green : C.red }}>{report.pnlPct}%</strong></span>
@@ -100,7 +100,7 @@ export default function Reports() {
                   const meta = getCurrencyMeta(a.currency);
                   return (
                     <div key={a.currency}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}>
                         <span style={{ color: C.t2, fontWeight: 600 }}>{meta.icon} {a.currency} · {a.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</span>
                         <span style={{ color: C.t1, fontWeight: 700 }}>{a.pct}% · {fmt(a.valueUsd)}</span>
                       </div>
@@ -125,7 +125,7 @@ export default function Reports() {
                   height={230}
                   gradientId="txGrad1"
                 />
-                <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 10, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 12, flexWrap: "wrap" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 5, color: C.t3 }}><span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: C.blue }} /> Depósitos</span>
                   <span style={{ display: "flex", alignItems: "center", gap: 5, color: C.t3 }}><span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: C.red }} /> Retiros</span>
                   <span style={{ display: "flex", alignItems: "center", gap: 5, color: C.t3 }}><span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: C.green }} /> Trading</span>

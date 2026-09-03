@@ -16,7 +16,7 @@ export default function SearchBar({ value, onChange, placeholder = "Buscar...", 
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        style={{ background: "none", border: "none", outline: "none", color: C.t1, fontSize: 11, width: "100%", fontFamily: FONT }}
+        style={{ background: "none", border: "none", outline: "none", color: C.t1, fontSize: 13, width: "100%", fontFamily: FONT }}
       />
       {value && (
         <button onClick={() => onChange("")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex" }} aria-label="Limpiar">

@@ -52,8 +52,8 @@ export default function OrderHistory() {
       key: "reference", header: "Referencia", sortable: true, sortValue: (o) => o.reference,
       render: (o) => (
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.t1 }}>{o.reference}</div>
-          <div style={{ fontSize: 9, color: C.t3 }}>{fmtDate(o.createdAt)}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.t1 }}>{o.reference}</div>
+          <div style={{ fontSize: 11, color: C.t3 }}>{fmtDate(o.createdAt)}</div>
         </div>
       ),
     },
@@ -67,33 +67,33 @@ export default function OrderHistory() {
     },
     {
       key: "asset", header: "Activo", sortable: true, sortValue: (o) => o.asset,
-      render: (o) => <span style={{ fontWeight: 700, fontSize: 11 }}>{o.asset.toUpperCase()}</span>,
+      render: (o) => <span style={{ fontWeight: 700, fontSize: 13 }}>{o.asset.toUpperCase()}</span>,
     },
     {
       key: "type", header: "Tipo", sortable: true, sortValue: (o) => o.type,
-      render: (o) => <span style={{ color: C.t2, fontSize: 10 }}>{TYPE_LABELS[o.type] || o.type}</span>,
+      render: (o) => <span style={{ color: C.t2, fontSize: 12 }}>{TYPE_LABELS[o.type] || o.type}</span>,
     },
     {
       key: "quantity", header: "Cantidad", align: "right", sortable: true, sortValue: (o) => o.quantity,
-      render: (o) => <span style={{ fontSize: 11 }}>{o.quantity}</span>,
+      render: (o) => <span style={{ fontSize: 13 }}>{o.quantity}</span>,
     },
     {
       key: "price", header: "Precio", align: "right", sortable: true, sortValue: (o) => o.price,
-      render: (o) => <span style={{ fontSize: 11 }}>{fmt(o.price)}</span>,
+      render: (o) => <span style={{ fontSize: 13 }}>{fmt(o.price)}</span>,
     },
     {
       key: "total", header: "Total", align: "right", sortable: true, sortValue: (o) => o.total,
       render: (o) => (
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600 }}>{fmt(o.total)}</div>
-          <div style={{ fontSize: 8, color: C.t3 }}>comisión {fmt(o.fee)}</div>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>{fmt(o.total)}</div>
+          <div style={{ fontSize: 10, color: C.t3 }}>comisión {fmt(o.fee)}</div>
         </div>
       ),
     },
     {
       key: "score", header: "IA", align: "center", sortable: true, sortValue: (o) => o.score,
       render: (o) => (
-        <span style={{ fontSize: 10, fontWeight: 800, color: o.score >= 65 ? C.green : o.score >= 45 ? C.gold : C.red }}>
+        <span style={{ fontSize: 12, fontWeight: 800, color: o.score >= 65 ? C.green : o.score >= 45 ? C.gold : C.red }}>
           {o.score}
         </span>
       ),
@@ -128,7 +128,7 @@ export default function OrderHistory() {
   };
 
   const selectSt: React.CSSProperties = {
-    padding: "6px 10px", fontSize: 11, borderRadius: 6, backgroundColor: C.card,
+    padding: "6px 10px", fontSize: 13, borderRadius: 6, backgroundColor: C.card,
     border: "1px solid " + C.border, color: C.t1, outline: "none", fontFamily: FONT, cursor: "pointer",
   };
 
@@ -165,7 +165,7 @@ export default function OrderHistory() {
             </select>
           </div>
           <div style={{ flex: 1 }} />
-          <span style={{ fontSize: 10, color: C.t3 }}>{filtered.length} órdenes</span>
+          <span style={{ fontSize: 12, color: C.t3 }}>{filtered.length} órdenes</span>
         </div>
 
         {filtered.length === 0 ? (
