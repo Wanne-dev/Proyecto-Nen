@@ -1,0 +1,120 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class InitialSchema1795024800000 implements MigrationInterface {
+    name = 'InitialSchema1795024800000'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TYPE "public"."wallet_balances_currency_enum" AS ENUM('USD', 'COP', 'EUR', 'BTC', 'ETH', 'USDC')`);
+        await queryRunner.query(`CREATE TABLE "wallet_balances" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "wallet_id" uuid NOT NULL, "currency" "public"."wallet_balances_currency_enum" NOT NULL, "balance" numeric(18,8) NOT NULL DEFAULT '0', "locked_amount" numeric(18,8) NOT NULL DEFAULT '0', "usd_rate" numeric(18,8) NOT NULL DEFAULT '1', "usd_rate_updated_at" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_eebe2c6f13f1a2de3457f8a885c" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE UNIQUE INDEX "IDX_1b60b0d14369f9d839beb925a5" ON "wallet_balances" ("wallet_id", "currency") `);
+        await queryRunner.query(`CREATE TYPE "public"."transactions_type_enum" AS ENUM('deposit', 'withdrawal', 'transfer_in', 'transfer_out', 'trade_buy', 'trade_sell', 'fee', 'refund')`);
+        await queryRunner.query(`CREATE TYPE "public"."transactions_status_enum" AS ENUM('pending', 'processing', 'completed', 'failed', 'cancelled', 'reversed')`);
+        await queryRunner.query(`CREATE TABLE "transactions" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "wallet_id" uuid NOT NULL, "user_id" uuid NOT NULL, "type" "public"."transactions_type_enum" NOT NULL, "status" "public"."transactions_status_enum" NOT NULL DEFAULT 'pending', "amount" numeric(18,8) NOT NULL, "currency" character varying(3) NOT NULL, "amount_usd" numeric(18,2) NOT NULL, "fee" numeric(18,8) NOT NULL DEFAULT '0', "fee_currency" character varying(3) NOT NULL DEFAULT 'USD', "description" character varying(500), "reference_id" character varying(100) NOT NULL, "ref_hash" character varying(64), "recipient_user_id" uuid, "recipient_wallet_id" uuid, "ip_address" character varying(45), "ia_score" numeric(5,2), "ia_risk_level" character varying(20), "metadata" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_365b158cbdb7b7bc18bca4004af" UNIQUE ("reference_id"), CONSTRAINT "PK_a219afd8dd77ed80f5a862f1db9" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_843ef91438dec68148bec2df9d" ON "transactions" ("user_id", "created_at") `);
+        await queryRunner.query(`CREATE INDEX "IDX_654b237d76bfa796f383c61ea1" ON "transactions" ("user_id", "status") `);
+        await queryRunner.query(`CREATE TYPE "public"."wallets_type_enum" AS ENUM('main', 'savings', 'virtual')`);
+        await queryRunner.query(`CREATE TABLE "wallets" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "type" "public"."wallets_type_enum" NOT NULL DEFAULT 'main', "total_balance_usd" numeric(18,2) NOT NULL DEFAULT '0', "is_active" boolean NOT NULL DEFAULT true, "daily_withdrawal_limit" numeric(18,2) NOT NULL DEFAULT '5000', "daily_withdrawn" numeric(18,2) NOT NULL DEFAULT '0', "daily_withdrawn_reset" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "REL_92558c08091598f7a4439586cd" UNIQUE ("user_id"), CONSTRAINT "PK_8402e5df5a30a229380e83e4f7e" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."audit_logs_action_enum" AS ENUM('login', 'login_failed', 'logout', 'register', 'password_change', 'two_factor_enabled', 'two_factor_disabled', 'deposit', 'withdrawal', 'transfer', 'order_created', 'order_cancelled', 'order_filled', 'kyc_verified', 'account_blocked', 'account_unlocked', 'settings_changed', 'fraud_detected', 'admin_action')`);
+        await queryRunner.query(`CREATE TABLE "audit_logs" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid, "action" "public"."audit_logs_action_enum" NOT NULL, "entity_type" character varying(50), "entity_id" character varying(100), "old_values" jsonb, "new_values" jsonb, "prev_hash" character varying(64), "curr_hash" character varying(64), "ip_address" character varying(45), "user_agent" text, "risk_score" numeric(5,2), "details" text, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_1bb179d048bbc581caa3b013439" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_7421efc125d95e413657efa3c6" ON "audit_logs" ("entity_type", "entity_id") `);
+        await queryRunner.query(`CREATE INDEX "IDX_e0ddecf5730c77f475e58eef3b" ON "audit_logs" ("user_id", "action") `);
+        await queryRunner.query(`CREATE TYPE "public"."orders_type_enum" AS ENUM('market', 'limit', 'stop_loss', 'take_profit', 'stop_limit', 'trailing_stop')`);
+        await queryRunner.query(`CREATE TYPE "public"."orders_side_enum" AS ENUM('buy', 'sell')`);
+        await queryRunner.query(`CREATE TYPE "public"."orders_status_enum" AS ENUM('pending', 'open', 'partially_filled', 'filled', 'cancelled', 'rejected', 'expired')`);
+        await queryRunner.query(`CREATE TABLE "orders" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "symbol" character varying(20) NOT NULL, "type" "public"."orders_type_enum" NOT NULL, "side" "public"."orders_side_enum" NOT NULL, "status" "public"."orders_status_enum" NOT NULL DEFAULT 'pending', "price" numeric(18,8), "stop_price" numeric(18,8), "quantity" numeric(18,8) NOT NULL, "filled_quantity" numeric(18,8) NOT NULL DEFAULT '0', "avg_fill_price" numeric(18,8) NOT NULL DEFAULT '0', "executed_total_usd" numeric(18,2), "quote_source" character varying(16), "ia_score" numeric(5,2), "ia_explanation" jsonb, "ia_risk_level" character varying(20), "expires_at" TIMESTAMP WITH TIME ZONE, "time_in_force" character varying(10) NOT NULL DEFAULT 'GTC', "commission" numeric(18,8) NOT NULL DEFAULT '0', "ip_address" character varying(45), "notes" text, "metadata" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_710e2d4957aa5878dfe94e4ac2f" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_00db5dad7aec3b9b4f5a0914ea" ON "orders" ("symbol", "status") `);
+        await queryRunner.query(`CREATE INDEX "IDX_cb77bc746d4e7b50c722fb2151" ON "orders" ("user_id", "status") `);
+        await queryRunner.query(`CREATE TYPE "public"."verification_codes_type_enum" AS ENUM('email_verification', 'phone_verification', 'two_factor', 'password_reset', 'login_verification')`);
+        await queryRunner.query(`CREATE TABLE "verification_codes" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "type" "public"."verification_codes_type_enum" NOT NULL, "code" character varying(6) NOT NULL, "target" character varying(255), "used" boolean NOT NULL DEFAULT false, "attempts" integer NOT NULL DEFAULT '0', "max_attempts" integer NOT NULL DEFAULT '5', "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL, "used_at" TIMESTAMP WITH TIME ZONE, "ip_address" character varying(45), "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "userId" uuid, CONSTRAINT "PK_18741b6b8bf1680dbf5057421d7" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_b0371c5216302227f1476767ff" ON "verification_codes" ("user_id", "type", "used") `);
+        await queryRunner.query(`CREATE TABLE "user_sessions" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "refresh_token" character varying(500) NOT NULL, "device_info" character varying(255), "user_agent" text, "ip_address" character varying(45), "location" jsonb, "is_active" boolean NOT NULL DEFAULT true, "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL, "last_activity_at" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "userId" uuid, CONSTRAINT "UQ_69214fd09be67af95c186be26db" UNIQUE ("refresh_token"), CONSTRAINT "PK_e93e031a5fed190d4789b6bfd83" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_2c6e259a9af837c1a7090bdda1" ON "user_sessions" ("user_id", "is_active") `);
+        await queryRunner.query(`CREATE TYPE "public"."notifications_type_enum" AS ENUM('transaction', 'security', 'trading', 'system', 'promotion', 'kyc')`);
+        await queryRunner.query(`CREATE TABLE "notifications" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "type" "public"."notifications_type_enum" NOT NULL, "title" character varying(255) NOT NULL, "message" text NOT NULL, "read" boolean NOT NULL DEFAULT false, "read_at" TIMESTAMP WITH TIME ZONE, "action_url" character varying(500), "metadata" jsonb, "priority" character varying(20) NOT NULL DEFAULT 'normal', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "userId" uuid, CONSTRAINT "PK_6a72c3c0f683f6462415e653c3a" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_a17edcb3b8e39c52a7d0554d31" ON "notifications" ("user_id", "read") `);
+        await queryRunner.query(`CREATE TABLE "user_settings" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "theme" character varying(10) NOT NULL DEFAULT 'dark', "language" character varying(5) NOT NULL DEFAULT 'es', "currency_display" character varying(3) NOT NULL DEFAULT 'COP', "email_notifications" boolean NOT NULL DEFAULT true, "push_notifications" boolean NOT NULL DEFAULT true, "sms_notifications" boolean NOT NULL DEFAULT false, "two_factor_method" character varying(20) NOT NULL DEFAULT 'email', "biometric_enabled" boolean NOT NULL DEFAULT false, "trading_confirmations" boolean NOT NULL DEFAULT true, "risk_tolerance" character varying(20) NOT NULL DEFAULT 'moderate', "auto_logout_minutes" integer NOT NULL DEFAULT '30', "hide_small_balances" boolean NOT NULL DEFAULT false, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_4ed056b9344e6f7d8d46ec4b302" UNIQUE ("user_id"), CONSTRAINT "PK_00f004f5922a0744d174530d639" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."users_document_type_enum" AS ENUM('cc', 'ce', 'ti', 'passport', 'nit', 'rut')`);
+        await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('user', 'analyst', 'operator', 'admin', 'compliance')`);
+        await queryRunner.query(`CREATE TYPE "public"."users_kyc_status_enum" AS ENUM('pending', 'verified', 'rejected', 'expired')`);
+        await queryRunner.query(`CREATE TYPE "public"."users_account_status_enum" AS ENUM('active', 'suspended', 'blocked', 'deleted')`);
+        await queryRunner.query(`CREATE TABLE "users" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "email" character varying(255) NOT NULL, "password_hash" character varying(255) NOT NULL, "first_name" character varying(100) NOT NULL, "last_name" character varying(100) NOT NULL, "document_type" "public"."users_document_type_enum" NOT NULL DEFAULT 'cc', "document_number" character varying(50), "date_of_birth" date, "phone" character varying(20), "email_verified" boolean NOT NULL DEFAULT false, "phone_verified" boolean NOT NULL DEFAULT false, "is_verified" boolean NOT NULL DEFAULT false, "two_factor_secret" character varying(255), "two_factor_enabled" boolean NOT NULL DEFAULT false, "failed_login_attempts" integer NOT NULL DEFAULT '0', "locked_until" TIMESTAMP WITH TIME ZONE, "reset_password_token" character varying(255), "reset_password_expires" TIMESTAMP WITH TIME ZONE, "role" "public"."users_role_enum" NOT NULL DEFAULT 'user', "kyc_status" "public"."users_kyc_status_enum" NOT NULL DEFAULT 'pending', "account_status" "public"."users_account_status_enum" NOT NULL DEFAULT 'active', "last_login_at" TIMESTAMP WITH TIME ZONE, "last_login_ip" character varying(45), "country" character varying(3) NOT NULL DEFAULT 'CO', "timezone" character varying(50) NOT NULL DEFAULT 'America/Bogota', "preferred_currency" character varying(3) NOT NULL DEFAULT 'COP', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_97672ac88f789774dd47f7c8be3" UNIQUE ("email"), CONSTRAINT "UQ_5f6c1b67ac12a1e7eb454a48e59" UNIQUE ("document_number"), CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_97672ac88f789774dd47f7c8be" ON "users" ("email") `);
+        await queryRunner.query(`CREATE TYPE "public"."market_prices_timeframe_enum" AS ENUM('1m', '5m', '15m', '1h', '4h', '1d', '1w', '1M')`);
+        await queryRunner.query(`CREATE TABLE "market_prices" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "asset_id" uuid NOT NULL, "timeframe" "public"."market_prices_timeframe_enum" NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "open_price" numeric(18,8) NOT NULL, "high_price" numeric(18,8) NOT NULL, "low_price" numeric(18,8) NOT NULL, "close_price" numeric(18,8) NOT NULL, "volume" numeric(18,2) NOT NULL, "trade_count" integer NOT NULL DEFAULT '0', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "assetId" uuid, CONSTRAINT "PK_cb959017562b6fe816d5a5c91dd" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE UNIQUE INDEX "IDX_06eac69d499836337c254b7a59" ON "market_prices" ("asset_id", "timeframe", "timestamp") `);
+        await queryRunner.query(`CREATE TYPE "public"."assets_type_enum" AS ENUM('crypto', 'stock', 'forex', 'commodity', 'index')`);
+        await queryRunner.query(`CREATE TABLE "assets" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "symbol" character varying(20) NOT NULL, "name" character varying(100) NOT NULL, "type" "public"."assets_type_enum" NOT NULL, "current_price" numeric(18,8) NOT NULL, "previous_close" numeric(18,8), "daily_change" numeric(10,4) NOT NULL DEFAULT '0', "daily_change_percent" numeric(10,4) NOT NULL DEFAULT '0', "volume_24h" numeric(18,2) NOT NULL DEFAULT '0', "market_cap" numeric(18,2), "high_24h" numeric(18,8), "low_24h" numeric(18,8), "is_active" boolean NOT NULL DEFAULT true, "logo_url" character varying(500), "description" text, "metadata" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_9b4bd5b9c6fe49cd3b4342fb914" UNIQUE ("symbol"), CONSTRAINT "PK_da96729a8b113377cfb6a62439c" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."webhook_logs_status_enum" AS ENUM('received', 'processed', 'failed', 'ignored')`);
+        await queryRunner.query(`CREATE TABLE "webhook_logs" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "provider" character varying(20) NOT NULL DEFAULT 'wompi', "event" character varying(100) NOT NULL, "signature" character varying(255), "payload" jsonb, "status" "public"."webhook_logs_status_enum" NOT NULL DEFAULT 'received', "error" text, "processed_at" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_c41f6cdf59cdfe3704807650896" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_9efdf41a964a31254aa81c87ee" ON "webhook_logs" ("provider", "event") `);
+        await queryRunner.query(`CREATE TABLE "system_settings" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "key" character varying(100) NOT NULL, "value" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_b1b5bc664526d375c94ce9ad43d" UNIQUE ("key"), CONSTRAINT "PK_82521f08790d248b2a80cc85d40" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "wallet_balances" ADD CONSTRAINT "FK_df71d0f9058318ebc25302aa365" FOREIGN KEY ("wallet_id") REFERENCES "wallets"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "transactions" ADD CONSTRAINT "FK_0b171330be0cb621f8d73b87a9e" FOREIGN KEY ("wallet_id") REFERENCES "wallets"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "transactions" ADD CONSTRAINT "FK_e9acc6efa76de013e8c1553ed2b" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "wallets" ADD CONSTRAINT "FK_92558c08091598f7a4439586cda" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "audit_logs" ADD CONSTRAINT "FK_bd2726fd31b35443f2245b93ba0" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "orders" ADD CONSTRAINT "FK_a922b820eeef29ac1c6800e826a" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "verification_codes" ADD CONSTRAINT "FK_9a854eeb4598a22d554ecfe6e81" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "user_sessions" ADD CONSTRAINT "FK_55fa4db8406ed66bc7044328427" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "notifications" ADD CONSTRAINT "FK_692a909ee0fa9383e7859f9b406" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "market_prices" ADD CONSTRAINT "FK_e0c09792bf8402ab94752779ca5" FOREIGN KEY ("assetId") REFERENCES "assets"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "market_prices" DROP CONSTRAINT "FK_e0c09792bf8402ab94752779ca5"`);
+        await queryRunner.query(`ALTER TABLE "notifications" DROP CONSTRAINT "FK_692a909ee0fa9383e7859f9b406"`);
+        await queryRunner.query(`ALTER TABLE "user_sessions" DROP CONSTRAINT "FK_55fa4db8406ed66bc7044328427"`);
+        await queryRunner.query(`ALTER TABLE "verification_codes" DROP CONSTRAINT "FK_9a854eeb4598a22d554ecfe6e81"`);
+        await queryRunner.query(`ALTER TABLE "orders" DROP CONSTRAINT "FK_a922b820eeef29ac1c6800e826a"`);
+        await queryRunner.query(`ALTER TABLE "audit_logs" DROP CONSTRAINT "FK_bd2726fd31b35443f2245b93ba0"`);
+        await queryRunner.query(`ALTER TABLE "wallets" DROP CONSTRAINT "FK_92558c08091598f7a4439586cda"`);
+        await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_e9acc6efa76de013e8c1553ed2b"`);
+        await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_0b171330be0cb621f8d73b87a9e"`);
+        await queryRunner.query(`ALTER TABLE "wallet_balances" DROP CONSTRAINT "FK_df71d0f9058318ebc25302aa365"`);
+        await queryRunner.query(`DROP TABLE "system_settings"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_9efdf41a964a31254aa81c87ee"`);
+        await queryRunner.query(`DROP TABLE "webhook_logs"`);
+        await queryRunner.query(`DROP TYPE "public"."webhook_logs_status_enum"`);
+        await queryRunner.query(`DROP TABLE "assets"`);
+        await queryRunner.query(`DROP TYPE "public"."assets_type_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_06eac69d499836337c254b7a59"`);
+        await queryRunner.query(`DROP TABLE "market_prices"`);
+        await queryRunner.query(`DROP TYPE "public"."market_prices_timeframe_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_97672ac88f789774dd47f7c8be"`);
+        await queryRunner.query(`DROP TABLE "users"`);
+        await queryRunner.query(`DROP TYPE "public"."users_account_status_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."users_kyc_status_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."users_role_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."users_document_type_enum"`);
+        await queryRunner.query(`DROP TABLE "user_settings"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_a17edcb3b8e39c52a7d0554d31"`);
+        await queryRunner.query(`DROP TABLE "notifications"`);
+        await queryRunner.query(`DROP TYPE "public"."notifications_type_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_2c6e259a9af837c1a7090bdda1"`);
+        await queryRunner.query(`DROP TABLE "user_sessions"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_b0371c5216302227f1476767ff"`);
+        await queryRunner.query(`DROP TABLE "verification_codes"`);
+        await queryRunner.query(`DROP TYPE "public"."verification_codes_type_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_cb77bc746d4e7b50c722fb2151"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_00db5dad7aec3b9b4f5a0914ea"`);
+        await queryRunner.query(`DROP TABLE "orders"`);
+        await queryRunner.query(`DROP TYPE "public"."orders_status_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."orders_side_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."orders_type_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_e0ddecf5730c77f475e58eef3b"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_7421efc125d95e413657efa3c6"`);
+        await queryRunner.query(`DROP TABLE "audit_logs"`);
+        await queryRunner.query(`DROP TYPE "public"."audit_logs_action_enum"`);
+        await queryRunner.query(`DROP TABLE "wallets"`);
+        await queryRunner.query(`DROP TYPE "public"."wallets_type_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_654b237d76bfa796f383c61ea1"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_843ef91438dec68148bec2df9d"`);
+        await queryRunner.query(`DROP TABLE "transactions"`);
+        await queryRunner.query(`DROP TYPE "public"."transactions_status_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."transactions_type_enum"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_1b60b0d14369f9d839beb925a5"`);
+        await queryRunner.query(`DROP TABLE "wallet_balances"`);
+        await queryRunner.query(`DROP TYPE "public"."wallet_balances_currency_enum"`);
+    }
+
+}
