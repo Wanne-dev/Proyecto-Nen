@@ -1,9 +1,0 @@
-# No enviar al contexto de Docker: mantiene la imagen ligera y el build rápido
-.venv
-__pycache__
-*.pyc
-.pytest_cache
-tests
-notebooks
-*.md
-.git

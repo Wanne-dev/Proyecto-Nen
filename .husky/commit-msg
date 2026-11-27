@@ -1,2 +1,0 @@
-# Valida el mensaje de commit con Conventional Commits (feat:, fix:, docs:, etc.)
-npx --no -- commitlint --edit "$1"
