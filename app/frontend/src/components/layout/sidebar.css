@@ -1,0 +1,365 @@
+/* A shared glass material; opaque fallback preserves legibility without backdrop-filter. */
+.nen-rail, .nen-glass-panel {
+  border: 1px solid var(--nen-line);
+  border-radius: 24px;
+  background: #121319;
+  color: var(--nen-ink);
+  box-shadow: var(--nen-specular);
+  color-scheme: dark;
+}
+@supports ((backdrop-filter: blur(24px)) or (-webkit-backdrop-filter: blur(24px))) {
+  .nen-rail, .nen-glass-panel {
+    background-color: var(--nen-material);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+  }
+}
+.nen-rail {
+  --nen-spacing: 12px;
+  --nen-copy-width: 180px;
+  --nen-section-base: #5C606E;
+  position: fixed;
+  z-index: 40;
+  inset: var(--nen-outer) auto var(--nen-outer) var(--nen-outer);
+  width: var(--nen-rail-width);
+  height: calc(100vh - 32px);
+  height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 14px;
+  overflow: visible;
+  transition: width var(--nen-gleam);
+}
+.nen-rail[data-drawer="true"] {
+  position: relative;
+  z-index: auto;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  transition: none;
+}
+.nen-rail[data-compact="true"] { --nen-spacing: 0px; --nen-copy-width: 0px; }
+.nen-rail__header {
+  height: 56px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.nen-rail__brand { display: flex; align-items: center; }
+.nen-rail__logo {
+  display: block;
+  width: auto;
+  height: 28px;
+  max-width: 108px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .42));
+}
+.nen-rail__toggle {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  inset-inline-end: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--nen-silver);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255,255,255,.035);
+  transition: inset-inline-end var(--nen-gleam), background-color .18s, color .18s;
+}
+.nen-rail[data-compact="true"] .nen-rail__toggle { inset-inline-end: calc(50% - 14px); }
+.nen-rail__toggle:hover { background: rgba(255, 255, 255, 0.1); color: var(--nen-ink); }
+.nen-rail__toggle:active { scale: .94; }
+
+.nen-rail__search, .nen-rail__link {
+  display: flex;
+  align-items: center;
+  gap: var(--nen-spacing);
+  text-align: start;
+  width: 100%;
+  padding: 0 12px;
+  color: var(--nen-silver);
+  transition: gap var(--nen-gleam), color .16s, background-color .16s, border-color .16s;
+}
+.nen-rail__search {
+  flex: none;
+  height: 52px;
+  margin-top: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.nen-rail__search:hover, .nen-rail__link:hover { background-color: rgba(255,255,255,.06); color: var(--nen-hover); }
+.nen-rail__glyph { width: 20px; height: 20px; stroke-width: 1.75; flex: none; }
+.nen-rail__search .nen-rail__glyph { color: #b4b7c2; }
+.nen-rail__reveal {
+  flex: 0 1 auto;
+  min-width: 0;
+  width: var(--nen-copy-width);
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  transition: width var(--nen-gleam), opacity .20s ease .04s;
+}
+.nen-rail[data-compact="true"] .nen-rail__reveal { opacity: 0; transition-delay: 0s; }
+.nen-rail__search-label { font-weight: 500; font-size: 13px; color: var(--nen-hover); }
+.nen-rail__keys {
+  width: min(43px, var(--nen-copy-width));
+  flex-shrink: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 10px;
+  line-height: 19px;
+  text-align: center;
+  color: #babdca;
+  background: rgba(255,255,255,.05);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.09);
+}
+
+.nen-rail__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 20px;
+  padding-block: 2px 4px;
+  overflow: hidden auto;
+  overscroll-behavior-y: contain;
+  scroll-padding-block: 4px;
+  scrollbar-width: none;
+}
+.nen-rail__scroll::-webkit-scrollbar { display: none; }
+.nen-rail__group + .nen-rail__group {
+  margin-top: 12px;
+}
+.nen-rail__group + .nen-rail__group::before, .nen-rail__footer::before {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-bottom: 9px;
+  background: var(--nen-divider);
+}
+.nen-rail__heading {
+  height: 24px;
+  display: flex;
+  align-items: start;
+  padding-inline-start: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  /* Base #5C606E + luminancia para texto de 11px sobre obsidiana. */
+  color: #878b98;
+  color: color-mix(in srgb, var(--nen-section-base) 73%, white);
+  transition: height var(--nen-gleam);
+}
+.nen-rail[data-compact="true"] .nen-rail__heading { height: 0; overflow: hidden; }
+.nen-rail__list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; list-style: none; }
+.nen-rail__link {
+  border: 1px solid transparent;
+  height: 42px;
+  position: relative;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.nen-rail__label { text-overflow: ellipsis; }
+.nen-rail__link[aria-current] {
+  color: var(--nen-ink);
+  border-color: rgba(212, 175, 55, 0.30);
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.16) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+.nen-rail__link[aria-current] .nen-rail__glyph { color: var(--nen-gold); }
+.nen-rail__link[aria-current]::before {
+  content: "";
+  width: 3px;
+  height: 18px;
+  border-radius: 99px;
+  background: var(--nen-gold);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.16);
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(50% - 9px);
+}
+.nen-rail__link:focus-visible, .nen-rail__search:focus-visible, .nen-rail__toggle:focus-visible, .nen-rail__profile:focus-visible,
+.nen-glass-dialog :focus-visible { outline: 2px solid var(--nen-focus); outline-offset: -2px; }
+
+.nen-rail__footer { margin-top: auto; padding-top: 6px; flex: none; }
+.nen-rail__footer::before { margin-bottom: 5px; }
+ .nen-rail__footer .nen-rail__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.nen-rail__footer .nen-rail__link { height: 34px; padding-inline: 7px; gap: 8px; font-size: 13px; border-radius: 9px; }
+.nen-rail[data-compact="true"] .nen-rail__footer .nen-rail__list { grid-template-columns: minmax(0, 1fr); gap: 1px; }
+.nen-rail[data-compact="true"] .nen-rail__footer .nen-rail__link { height: 28px; gap: 0; padding-inline: 12px; }
+.nen-rail__profile {
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: min(9px, var(--nen-spacing));
+  padding: 10px;
+  text-align: start;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: padding var(--nen-gleam), gap var(--nen-gleam), background-color .16s, border-color .16s;
+}
+.nen-rail[data-compact="true"] .nen-rail__profile { padding-inline: 5px; }
+.nen-rail__profile:hover { background: rgba(255,255,255,.06); border-color: rgba(212,175,55,.25); }
+.nen-rail__avatar {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(212,175,55,.35);
+  border-radius: 50%;
+  background: linear-gradient(160deg, #3c331e, #222024 80%);
+  color: #f2d77b;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .025em;
+}
+.nen-rail__avatar--badge::before { content: attr(data-initials); }
+.nen-rail__identity { display: grid; gap: 2px; line-height: 1.2; }
+.nen-rail__name, .nen-rail__role { display: block; overflow: hidden; text-overflow: ellipsis; }
+.nen-rail__name { font-size: 13px; font-weight: 650; }
+.nen-rail__role { color: #a0a3af; font-size: 11px; }
+.nen-rail__exit { flex: none; width: min(16px, var(--nen-copy-width)); color: var(--nen-silver); }
+.nen-rail__profile:hover .nen-rail__exit { color: var(--nen-gold); }
+.nen-rail__tooltip {
+  position: absolute;
+  z-index: 1;
+  inset-inline-start: calc(100% + 10px);
+  transform: translateY(-50%);
+  width: max-content;
+  max-width: min(260px, calc(100vw - 112px));
+  padding: 7px 11px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 9px;
+  background: #23242a;
+  box-shadow: 0 8px 20px #0009;
+  color: var(--nen-hover);
+  font-size: 12px;
+  line-height: 1.25;
+}
+.nen-rail__tooltip::before { content: ""; position: absolute; inset: -2px 100% -2px auto; width: 11px; }
+
+/* Native top layer: fixed visual layer 50, with keyboard trap and inert background. */
+html:has(.nen-glass-dialog[open]) { overflow: hidden; }
+.nen-glass-dialog {
+  position: fixed;
+  z-index: 50;
+  color-scheme: dark;
+  color: var(--nen-ink);
+  padding: 0;
+  opacity: 0;
+  transform: var(--nen-dialog-off, translateY(9px) scale(.98));
+  transition: opacity var(--nen-gleam), transform var(--nen-gleam);
+  transition: opacity var(--nen-gleam), transform var(--nen-gleam), display var(--nen-gleam) allow-discrete, overlay var(--nen-gleam) allow-discrete;
+}
+.nen-glass-dialog:not([open]) { pointer-events: none; }
+.nen-glass-dialog[open] { opacity: 1; transform: none; }
+.nen-glass-dialog::backdrop {
+  background: rgba(2,3,7,.63);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity var(--nen-gleam), display var(--nen-gleam) allow-discrete, overlay var(--nen-gleam) allow-discrete;
+}
+.nen-glass-dialog[open]::backdrop { opacity: 1; }
+@starting-style {
+  .nen-glass-dialog[open] { opacity: 0; transform: var(--nen-dialog-off, translateY(9px) scale(.98)); }
+  .nen-glass-dialog[open]::backdrop { opacity: 0; }
+}
+.nen-rail-drawer {
+  --nen-dialog-off: translateX(calc(-100% - 16px));
+  inset: var(--nen-outer) auto var(--nen-outer) var(--nen-outer);
+  margin: 0;
+  width: min(var(--nen-expanded), calc(100vw - 32px));
+  height: calc(100vh - 32px);
+  height: calc(100dvh - 32px);
+  max-width: none;
+  max-height: none;
+  border: 0;
+  border-radius: 24px;
+  overflow: visible;
+  background: transparent;
+}
+.nen-rail-drawer:not([open]) { opacity: 1; }
+.nen-glass-panel {
+  inset: 0;
+  width: min(540px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  overflow: auto;
+  overscroll-behavior: contain;
+  /* The command dialog can sit over lighter charts; keep vocabulary legible. */
+  background-color: rgba(20,21,26,.95);
+}
+.nen-glass-panel__head { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 20px 20px 15px; }
+.nen-glass-panel__eyebrow { color: var(--nen-gold); font-size: 10px; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
+.nen-glass-panel h2 { margin-top: 4px; font-size: 24px; font-weight: 650; letter-spacing: -.025em; line-height: 1.2; }
+.nen-modal__close {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid var(--nen-line);
+  background: rgba(255,255,255,.045);
+  color: var(--nen-hover);
+}
+.nen-modal__close:enabled:hover { background-color: rgba(255,255,255,.10); }
+.nen-command__body { padding: 0 20px; }
+.nen-command__field { display: flex; align-items: center; gap: 10px; padding-inline: 12px; border: 1px solid #51515c; border-radius: 12px; background: #15161c; color: var(--nen-gold); }
+.nen-command__field:focus-within { border-color: var(--nen-gold); }
+.nen-command__field input { width: 100%; min-width: 0; height: 44px; background: transparent; color: #fff; font-size: 14px; outline: none !important; }
+.nen-command__field input::placeholder { color: #9396a4; }
+.nen-command__list {
+  max-height: min(48vh, 330px);
+  margin-block: 10px;
+  display: grid;
+  gap: 3px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+}
+.nen-command__result { display: flex; min-height: 42px; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 10px; color: #edeef5; font-size: 14px; }
+.nen-command__result:hover, .nen-command__result:focus { background: rgba(212,175,55,.11); }
+.nen-command__result svg { flex: none; color: #b0b2bd; }
+.nen-command__result small { flex: none; color: #a6a8b6; font-size: 11px; }
+.nen-command__name { flex: 1; }
+.nen-command__empty { padding: 20px 0; font-size: 14px; color: #bfc1cb; }
+.nen-command__hint { border-top: 1px solid var(--nen-line); display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 20px; color: #aeb1bf; font-size: 11px; }
+.nen-command__hint kbd { border-radius: 4px; background: rgba(255,255,255,.07); padding: 2px 5px; color: #d8d9e3; }
+.nen-session { width: min(372px, calc(100vw - 32px)); }
+.nen-session__identity { display: flex; align-items: center; gap: 11px; margin: 0 20px; padding: 11px; border-radius: 14px; border: 1px solid var(--nen-line); background: rgba(255,255,255,.03); }
+.nen-session__identity div { display: grid; min-width: 0; gap: 2px; overflow-wrap: anywhere; font-size: 14px; }
+.nen-session__identity div span { font-size: 12px; color: #aeb1bf; }
+.nen-session__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; padding: 18px 20px 20px; }
+.nen-session__actions button { min-height: 42px; display: flex; gap: 7px; align-items: center; border-radius: 11px; padding: 5px 13px; border: 1px solid var(--nen-line); background-color: rgba(255,255,255,.05); font-size: 13px; font-weight: 650; }
+.nen-session__actions .nen-session__confirm { background: #e0be54; color: #201809; }
+.nen-session__actions button:enabled:hover { filter: brightness(1.14); }
+.nen-glass-panel button:disabled { opacity: .65; cursor: wait; }
+.nen-session__error { margin: 10px 20px 0; color: #ffb3b8; font-size: 13px; }
+@media (max-width: 440px) {
+  .nen-command__result small { display: none; }
+}
+@media (max-height: 470px) {
+  .nen-rail__header { height: 36px; }
+  .nen-rail__search { margin-top: 10px; }
+  .nen-rail__scroll { margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nen-rail, .nen-rail *, .nen-glass-dialog, .nen-glass-dialog::backdrop { transition: none !important; }
+  .nen-rail__toggle:active { scale: none; }
+}
+@media (forced-colors: active) {
+  .nen-rail, .nen-glass-panel, .nen-rail__tooltip { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  .nen-rail__link[aria-current] { border-color: Highlight; color: LinkText; }
+  .nen-rail__link[aria-current]::before { background: Highlight; forced-color-adjust: none; }
+}

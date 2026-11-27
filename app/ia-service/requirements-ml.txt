@@ -1,0 +1,13 @@
+# ─────────────────────────────────────────────────────────────
+# BANCA NEN — IA Service (dependencias de ENTRENAMIENTO)
+# Lista opcional de referencia; no existe un pipeline de entrenamiento activo.
+# No interviene en la instalación, las pruebas ni la imagen del servicio.
+#
+#   pip install -r requirements-ml.txt
+# ─────────────────────────────────────────────────────────────
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.4.2
+xgboost==2.0.3
+shap==0.45.1
+joblib==1.4.0

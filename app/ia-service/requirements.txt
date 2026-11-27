@@ -1,0 +1,9 @@
+# ─────────────────────────────────────────────────────────────
+# BANCA NEN — IA Service (dependencias de RUNTIME)
+# Solo lo necesario para servir la API de scoring.
+# Las dependencias de ENTRENAMIENTO de modelos están en
+# No incluye dependencias de entrenamiento.
+# ─────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2

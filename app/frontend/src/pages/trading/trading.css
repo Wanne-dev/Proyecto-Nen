@@ -1,0 +1,57 @@
+.nen-market { display: grid; gap: 20px; color: #f0f6f4; }
+.nen-market__intro,.nen-market__section-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px 20px; }
+.nen-market__intro { align-items: end; margin-bottom: 3px; }
+.nen-market__eyebrow { display: flex; gap: 7px; align-items: center; color: var(--portal-accent); font-weight: 650; font-size: .72rem; letter-spacing: .12em; }
+.nen-market h1 { font-size: clamp(2rem, 4.4vw, 3rem); line-height: 1.1; letter-spacing: -.045em; font-weight: 700; margin: 7px 0; }
+.nen-market__intro p:last-child { color: var(--portal-muted); }
+.nen-market__shortcuts { display: flex; gap: 8px; flex-wrap: wrap; }
+.nen-market__action { background: #141a1f; border: 1px solid var(--portal-line); border-radius: 10px; padding: 9px 12px; display: inline-flex; gap: 7px; align-items: center; font-size: .82rem; }
+.nen-market__action:hover:not(:disabled) { background: #1e282b; }
+.nen-market__action:disabled { opacity: .65; }
+.nen-market__assets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.nen-market__asset { display: flex; align-items: center; gap: 10px; padding: 13px; min-width: 0; border: 1px solid var(--portal-line); background: var(--portal-surface); border-radius: 13px; text-align: left; }
+.nen-market__asset:hover { border-color: #588076; }
+.nen-market__asset[aria-pressed="true"] { border-color: #5ca48f; background: linear-gradient(110deg, #182a26, #151c20 88%); }
+.nen-market__asset strong,.nen-market__asset small { display: block; }
+.nen-market__asset strong { font-size: .89rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.nen-market__asset small { color: var(--portal-muted); font-size: .75rem; }
+.nen-market__asset small.text-emerald-300 { color: #92e9cc; }
+.nen-market__asset small.text-rose-300 { color: #fda4af; }
+.nen-market__coin-icon,.nen-market__trade-symbol { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 10px; font-weight: 750; font-size: 1.05rem; }
+.nen-market__asset-price { margin-left: auto; text-align: right; overflow-wrap: anywhere; }
+.nen-market__grid { display: grid; gap: 16px; align-items: start; }
+.nen-market__surface { padding: clamp(13px, 1.7vw, 22px); min-width: 0; border: 1px solid var(--portal-line); border-radius: 16px; background: var(--portal-surface); }
+.nen-market__section-head h2,.nen-market__trade-head h2 { font-weight: 650; font-size: 1rem; }
+.nen-market__section-head h2 > span { margin-inline-start: 6px; font-size: .77rem; color: var(--portal-muted); font-weight: 500; }
+.nen-market__price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(1.6rem, 3.4vw, 2.24rem); letter-spacing: -.04em; }
+.nen-market__price > span { display: inline-flex; align-items: center; gap: 3px; font-size: .82rem; letter-spacing: normal; }
+.nen-market__price small { color: var(--portal-muted); font-weight: 500; font-size: .71rem; margin-left: 3px; }
+.nen-market__meta,.nen-market__caption { color: var(--portal-muted); font-size: .75rem; }
+.nen-market__caption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3px 10px; margin-top: 9px; }
+.nen-market__ranges { display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; border: 1px solid var(--portal-line); border-radius: 9px; }
+.nen-market__ranges button { font-size: .79rem; padding: 6px 9px; border-radius: 6px; color: var(--portal-muted); }
+.nen-market__ranges button:hover { background: #202d33; }
+.nen-market__ranges button[aria-pressed="true"] { color: #c7f8e7; background: #254238; font-weight: 650; }
+.nen-market__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px 0; margin: 14px 0; border-block: 1px solid var(--portal-line); }
+.nen-market__stats dt { color: var(--portal-muted); font-size: .72rem; }
+.nen-market__stats dd { overflow-wrap: anywhere; font-variant-numeric: tabular-nums; font-weight: 600; font-size: .87rem; }
+.nen-market__empty { min-height: 240px; display: grid; gap: 8px; place-content: center; justify-items: center; text-align: center; border-radius: 11px; background: #101519; color: #becdcf; }
+.nen-market__empty svg { color: #8be5cb; }
+.nen-market__empty span { font-size: .8rem; color: var(--portal-muted); }
+.nen-market__trade-head { display: flex; align-items: center; gap: 9px; margin-bottom: 15px; }
+.nen-market__trade-head p { display: flex; gap: 5px; align-items: center; color: var(--portal-muted); font-size: .79rem; }
+.nen-market__trade-symbol { background: #233b34; color: #a3edda; }
+.nen-market__order-error,.nen-market__execution { margin-top: 13px; padding: 12px; border-radius: 10px; border: 1px solid #775058; background: #342027; color: #ffd1d9; font-size: .8rem; }
+.nen-market__execution { border-color: #406c61; background: #1a312b; color: #c6f7e8; }
+.nen-market__execution strong { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.nen-market__execution a { display: inline-block; text-decoration: underline; margin-top: 4px; }
+.nen-market__book-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; margin-top: 14px; }
+.nen-market__book-table { width: 100%; font-size: .81rem; font-variant-numeric: tabular-nums; }
+.nen-market__book-table caption { text-align: left; font-weight: 650; padding-bottom: 5px; }
+.nen-market__book-table th,.nen-market__book-table td { padding: 6px 4px; border-bottom: 1px solid #252e35; }
+.nen-market__book-table th { color: var(--portal-muted); font-weight: 500; }
+.nen-market__book-table th:first-child,.nen-market__book-table td:first-child { text-align: left; }
+.nen-market__book-table th:last-child,.nen-market__book-table td:last-child { text-align: right; }
+@media (min-width: 1220px) { .nen-market__grid { grid-template-columns: minmax(0, 1fr) minmax(275px, 29%); } }
+@media (max-width: 700px) { .nen-market__assets { grid-template-columns: 1fr; gap: 7px; } .nen-market__asset { padding: 8px 11px; } }
+@media (max-width: 430px) { .nen-market__book-grid { grid-template-columns: 1fr; } }
