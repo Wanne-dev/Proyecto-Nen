@@ -1,0 +1,54 @@
+# Esta edicion publica solo la web en loopback y usa volumenes propios.
+name: nen-demo-accesos-796ed55771
+
+x-local-env: &local-env
+  NODE_ENV: development
+  APP_MODE: virtual
+  NEN_FIXTURE_EDITION: "796ed55771"
+  DB_HOST: postgres
+  DB_PORT: '5432'
+  DB_USER: banca_nen
+  DB_NAME: nen_demo_796ed55771
+  DB_PASSWORD: 'WrWce-QvvJXUg28dtkXpKXqjXGYp4GMR'
+  DB_SSL: 'false'
+  DATABASE_URL: ''
+  JWT_SECRET: ''
+  ENCRYPTION_KEY: ''
+  AUTH_KEY_FILE: /app/backend/.local/nen-auth.key
+  FRONTEND_URL: http://banca-nen.localhost:5184
+  EMAIL_PROVIDER: ${EMAIL_PROVIDER:-console}
+  EMAIL_FROM: ${EMAIL_FROM:-}
+  RESEND_API_KEY: ${RESEND_API_KEY:-}
+  SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_SECURE: ${SMTP_SECURE:-false}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASS: ${SMTP_PASS:-}
+  SMTP_FROM: ${SMTP_FROM:-}
+  TWILIO_ACCOUNT_SID: ''
+  TWILIO_AUTH_TOKEN: ''
+  TWILIO_PHONE_NUMBER: ''
+  MARKET_OFFLINE: 'false'
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+
+services:
+  postgres:
+    ports: !override []
+    environment:
+      POSTGRES_DB: nen_demo_796ed55771
+      POSTGRES_PASSWORD: 'WrWce-QvvJXUg28dtkXpKXqjXGYp4GMR'
+    healthcheck:
+      test: [CMD, pg_isready, -U, banca_nen, -d, nen_demo_796ed55771]
+  backend-migrate:
+    image: nen-demo-accesos-796ed55771-backend:local
+    environment: *local-env
+  backend:
+    image: nen-demo-accesos-796ed55771-backend:local
+    ports: !override []
+    environment: *local-env
+  frontend:
+    ports: !override
+      - '127.0.0.1:5184:80'
+    healthcheck:
+      interval: 4s
