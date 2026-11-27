@@ -51,3 +51,13 @@ __pycache__/
 .idea/
 Thumbs.db
 desktop.ini
+
+# Secretos y artefactos locales de esta copia
+perfil.env
+.local/
+*.key
+*.pem
+app/backend/.local/
+app/frontend/dist/
+app/ia-service/.pytest_cache/
+app/ia-service/__pycache__/

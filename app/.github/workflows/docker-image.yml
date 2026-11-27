@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Web y API — calidad y PostgreSQL real
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: nen_ci
+          POSTGRES_PASSWORD: isolated-ci-only
+          POSTGRES_DB: banca_nen_test
+        ports: [5432/tcp]
+        options: >-
+          --health-cmd "pg_isready -U nen_ci -d banca_nen_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Instalar desde el lockfile
+        run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+          SCARF_ANALYTICS: 'false'
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - name: Migraciones y operaciones virtuales (BD nueva)
+        run: pnpm test:postgres
+        env:
+          PG_TEST_DATABASE: '1'
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_USER: nen_ci
+          DB_PASSWORD: isolated-ci-only
+          DB_NAME: banca_nen_test
+          EMAIL_PROVIDER: console
+          MARKET_OFFLINE: 'true'
+      - run: pnpm build
+
+  ia-test:
+    name: FastAPI — análisis por reglas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: ia-service/requirements*.txt
+      - run: python -m pip install -r requirements-dev.txt
+        working-directory: ia-service
+      - run: python -m pytest -q
+        working-directory: ia-service
+
+  docker:
+    name: Construir y arrancar la aplicación Docker
+    needs: [test, ia-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir las imágenes y aplicar la migración en un volumen nuevo
+        run: docker compose -p banca-nen-ci up -d --build --wait --wait-timeout 180
+      - name: Verificar el frontend y la API a través del proxy
+        run: |
+          docker compose -p banca-nen-ci ps -a
+          test "$(docker compose -p banca-nen-ci config --services | sort | xargs)" = "backend backend-migrate frontend postgres"
+          curl -fsS http://127.0.0.1:5173/ -o /dev/null
+          curl -fsS http://127.0.0.1:5173/api/v1/health | jq -e '.status == "ok" and .database == "conectada"'
+      - name: Mostrar diagnóstico si falla
+        if: failure()
+        run: docker compose -p banca-nen-ci logs --no-color
+      - name: Retirar los recursos efímeros de CI
+        if: always()
+        run: docker compose -p banca-nen-ci down -v

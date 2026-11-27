@@ -1,0 +1,5 @@
+* text=auto
+
+# Los lanzadores de Windows se entregan con CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf

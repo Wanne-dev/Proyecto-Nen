@@ -1,0 +1,38 @@
+# Cambios del entorno privado de validación, no otro stack completo.
+# Usar después de docker-compose.yml, con archivo privado y proxy TLS.
+name: banca-nen-staging
+
+x-staging: &staging
+  image: banca-nen-backend:staging
+  environment:
+    NODE_ENV: production
+    APP_MODE: locked
+    AUTH_KEY_FILE: ""
+    DB_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD para staging}
+    JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET para staging}
+    ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Define ENCRYPTION_KEY para staging}
+    FRONTEND_URL: ${FRONTEND_URL:?Define FRONTEND_URL para staging}
+
+services:
+  postgres:
+    ports: !reset []
+    volumes: !override
+      - postgres_staging_v17:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD para staging}
+
+  backend-migrate:
+    <<: *staging
+    volumes: !override []
+
+  backend:
+    <<: *staging
+    volumes: !override []
+    ports: !reset []
+
+  frontend:
+    ports: !override
+      - '127.0.0.1:${WEB_PORT:-8080}:80'
+
+volumes: !override
+  postgres_staging_v17:
